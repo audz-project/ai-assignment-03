@@ -761,11 +761,6 @@ function renderPodium(){
       const v=r[k],pct=Math.round(v/mx*100);
       return `<div class="p-bar-row"><span class="bl">${lb}</span><div class="p-bar-track"><div class="p-bar-fill" style="width:${pct}%"></div></div><span class="bv">${v}</span></div>`;
     }).join('');
-    const revs=(r.review_list||[]).map(rv=>{
-      let det='';
-      if(rv.food||rv.service){det=`<div class="rev-detail"><span>อาหาร <b>${rv.food||'-'}</b></span><span>บริการ <b>${rv.service||'-'}</b></span><span>บรรยากาศ <b>${rv.atmos||'-'}</b></span></div>`;}
-      return `<div class="rev-item"><div class="rev-top"><span class="rev-stars">${stars(rv.stars)}</span><span class="rev-date">${rv.date||''}</span></div><div class="rev-text">${rv.text}</div>${det}</div>`;
-    }).join('')||'<p class="note">ไม่มีรีวิวที่มีข้อความ</p>';
     const tags=(r.tags?r.tags.split('; '):[]).map(t=>`<span class="chip amber">${t}</span>`).join('');
     return `<div class="p-card ${i===0?'gold':''} reveal">
       <div class="p-rank">${i+1}</div>
@@ -780,15 +775,13 @@ function renderPodium(){
         <iframe class="p-map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
           src="https://www.google.com/maps?q=${r.lat},${r.lng}&z=16&output=embed"></iframe>
         <div class="p-actions">
-          <span class="p-btn primary" onclick="toggleRev(${i})">ดูรีวิวลูกค้า</span>
-          <a class="p-btn" href="${r.url}" target="_blank" rel="noopener">เปิด Google Maps</a>
+          <a class="p-btn primary" href="${r.url}" target="_blank" rel="noopener">เปิด Google Maps</a>
         </div>
       </div>
-      <div class="rev-drawer" id="rev${i}">${revs}</div>
     </div>`;
   }).join('');
 }
-function toggleRev(i){document.getElementById('rev'+i).classList.toggle('open');}
+function toggleRev(i){/* deprecated */}
 
 // ---- FILTER + TABLE ----
 let curFilter='all',curSort='rank',sortDir=1;
@@ -859,8 +852,7 @@ function mapRow(r){
     groups:r.crowd_groups||'', reserve:r.accepts_reservation||'',
     closes_late:r.closes_after_2100||'', lat:Number(r.lat)||0, lng:Number(r.lng)||0,
     url:'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(r.name||''),
-    ai_analysis:r.ai_analysis||'',
-    review_list:[]
+    ai_analysis:r.ai_analysis||''
   };
 }
 
