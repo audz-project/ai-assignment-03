@@ -190,6 +190,13 @@ section{padding:54px 0;position:relative}
   font-size:14.5px;color:var(--text-dim);line-height:1.65;
   padding:16px 0;border-top:1px solid var(--line2);
 }
+.ai-tag{
+  display:inline-block;font-size:10.5px;font-weight:500;letter-spacing:0.4px;
+  padding:2px 8px;border-radius:10px;
+  background:rgba(245,158,11,0.12);color:var(--amber);
+  border:1px solid rgba(245,158,11,0.3);
+  margin-right:6px;vertical-align:middle;
+}
 .p-meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
 .chip{
   font-size:11px;padding:4px 10px;border-radius:20px;
@@ -271,6 +278,8 @@ tbody tr:nth-child(-n+3) .t-rank{color:var(--amber)}
 .t-score{font-family:'Bebas Neue';font-size:20px;color:var(--amber)}
 .t-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:3px}
 .t-tag{font-size:10px;padding:2px 7px;border-radius:10px;background:var(--bg2);color:var(--text-mute);border:1px solid var(--line2)}
+.t-ai{font-size:12px;line-height:1.55;color:var(--text-dim);margin-top:6px;max-width:520px}
+.t-ai .ai-tag{font-size:9.5px;padding:1px 6px}
 .t-badge{font-size:11px;padding:3px 9px;border-radius:11px;display:inline-block}
 .t-badge.open{background:rgba(126,184,126,.12);color:var(--green);border:1px solid rgba(126,184,126,.3)}
 .t-badge.late{background:rgba(224,192,78,.1);color:var(--yellow);border:1px solid rgba(224,192,78,.3)}
@@ -767,7 +776,7 @@ function renderPodium(){
         <div class="p-score-big"><span class="n">${r.total}</span><span class="d">/ 100 คะแนน</span></div>
         <div class="p-meta">${tags}<span class="chip">฿${r.price}/หัว</span><span class="chip">${fmtDist(r.dist)} จาก BTS</span></div>
         <div class="p-bars">${bars}</div>
-        <div class="p-why">${ANALYSIS[i]}</div>
+        <div class="p-why"><span class="ai-tag">AI วิเคราะห์</span> ${r.ai_analysis || ANALYSIS[i] || ''}</div>
         <iframe class="p-map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
           src="https://www.google.com/maps?q=${r.lat},${r.lng}&z=16&output=embed"></iframe>
         <div class="p-actions">
@@ -812,7 +821,7 @@ function renderTable(){
       :'<span class="t-badge open">เปิดมื้อเย็น</span>';
     return `<tr>
       <td class="num"><span class="t-rank">${i+1}</span></td>
-      <td><div class="t-name">${r.name} <span class="tcat">· ${r.cat}</span></div><div class="t-tags">${tags}</div></td>
+      <td><div class="t-name">${r.name} <span class="tcat">· ${r.cat}</span></div><div class="t-tags">${tags}</div>${r.ai_analysis?`<div class="t-ai"><span class="ai-tag">AI</span> ${r.ai_analysis}</div>`:''}</td>
       <td class="num">${r.rating} <span style="color:var(--text-mute);font-size:12px">(${r.reviews})</span></td>
       <td class="num">฿${r.price}</td>
       <td class="num">${fmtDist(r.dist)}</td>
@@ -850,6 +859,7 @@ function mapRow(r){
     groups:r.crowd_groups||'', reserve:r.accepts_reservation||'',
     closes_late:r.closes_after_2100||'', lat:Number(r.lat)||0, lng:Number(r.lng)||0,
     url:'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(r.name||''),
+    ai_analysis:r.ai_analysis||'',
     review_list:[]
   };
 }
