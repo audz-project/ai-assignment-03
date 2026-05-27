@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thonglor Dinner Radar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@400;500;600;700&family=Noto+Sans+Thai:wght@300;400;500;600;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#181311; --bg2:#211a16; --card:#262019; --card2:#2e261e;
+  --line:#3a302704; --line2:#403529;
+  --amber:#e0a84e; --amber-bright:#f2bd5e; --amber-dim:#9a7d4a;
+  --text:#f0e9df; --text-dim:#b3a690; --text-mute:#8a7d6a;
+  --green:#7eb87e; --yellow:#e0c04e; --grey:#7a7066;
+  --shadow:0 18px 50px -12px rgba(0,0,0,.7);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Noto Sans Thai',sans-serif;
+  font-weight:300;
+  line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 60% 50% at 20% 0%,rgba(224,168,78,.10),transparent 70%),
+    radial-gradient(ellipse 50% 40% at 90% 10%,rgba(224,168,78,.06),transparent 70%);
+}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px;position:relative;z-index:1}
+.serif{font-family:'Noto Serif Thai',serif}
+
+/* ===== HERO ===== */
+.hero{padding:90px 0 60px;position:relative}
+.hero-tag{
+  display:inline-flex;align-items:center;gap:9px;
+  font-size:13px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--amber);font-weight:500;margin-bottom:26px;
+}
+.hero-tag::before{content:'';width:32px;height:1px;background:var(--amber)}
+.radar-dot{
+  width:7px;height:7px;border-radius:50%;background:var(--amber);
+  box-shadow:0 0 0 0 rgba(224,168,78,.6);animation:pulse 2.4s infinite;
+}
+@keyframes pulse{
+  0%{box-shadow:0 0 0 0 rgba(224,168,78,.5)}
+  70%{box-shadow:0 0 0 12px rgba(224,168,78,0)}
+  100%{box-shadow:0 0 0 0 rgba(224,168,78,0)}
+}
+h1.title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(64px,12vw,140px);
+  line-height:.92;letter-spacing:.01em;
+  color:var(--text);font-weight:400;
+}
+h1.title .amber{color:var(--amber);display:block}
+.hero-sub{
+  font-family:'Noto Serif Thai',serif;
+  font-size:clamp(17px,2.2vw,22px);
+  color:var(--text-dim);font-weight:400;
+  margin-top:24px;max-width:560px;
+}
+.hero-meta{
+  display:flex;flex-wrap:wrap;gap:30px;margin-top:40px;
+  padding-top:30px;border-top:1px solid var(--line2);
+}
+.hero-meta div{font-size:15px}
+.hero-meta .k{color:var(--text-mute);letter-spacing:.04em;margin-bottom:3px}
+.hero-meta .v{color:var(--text);font-weight:500;font-size:15px}
+
+/* ===== SECTION ===== */
+section{padding:54px 0;position:relative}
+.sec-head{display:flex;align-items:baseline;gap:16px;margin-bottom:34px}
+.sec-num{
+  font-family:'Bebas Neue',sans-serif;font-size:22px;
+  color:var(--amber-dim);letter-spacing:.05em;
+}
+.sec-title{
+  font-family:'Noto Serif Thai',serif;
+  font-size:clamp(24px,3.4vw,33px);font-weight:600;color:var(--text);
+}
+.sec-desc{color:var(--text-dim);max-width:680px;margin-top:-22px;margin-bottom:34px;font-size:16px}
+
+/* ===== RADAR STATUS BAR ===== */
+.radar-bar{
+  background:linear-gradient(135deg,var(--card2),var(--card));
+  border:1px solid var(--line2);border-radius:18px;
+  padding:24px 28px;display:flex;flex-wrap:wrap;
+  align-items:center;gap:22px;justify-content:space-between;
+  box-shadow:var(--shadow);
+}
+.radar-status{display:flex;align-items:center;gap:14px}
+.radar-ring{
+  width:44px;height:44px;border-radius:50%;
+  border:2px solid var(--green);position:relative;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+}
+.radar-ring::after{
+  content:'';width:14px;height:14px;border-radius:50%;
+  background:var(--green);box-shadow:0 0 14px var(--green);
+}
+.radar-ring.sweep::before{
+  content:'';position:absolute;inset:-2px;border-radius:50%;
+  background:conic-gradient(from 0deg,transparent 70%,rgba(126,184,126,.5));
+  animation:sweep 3s linear infinite;
+}
+@keyframes sweep{to{transform:rotate(360deg)}}
+.radar-status .label{font-size:13px;color:var(--text-mute);letter-spacing:.03em}
+.radar-status .value{font-size:16px;color:var(--text);font-weight:500}
+.radar-info{display:flex;gap:30px;flex-wrap:wrap}
+.radar-info .ri .k{font-size:12px;color:var(--text-mute);letter-spacing:.04em}
+.radar-info .ri .v{font-size:15px;color:var(--amber);font-weight:600;font-family:'Noto Sans Thai'}
+.btn-refresh{
+  background:var(--amber);color:#1a1410;border:none;
+  font-family:'Noto Sans Thai';font-weight:600;font-size:14px;
+  padding:13px 26px;border-radius:11px;cursor:pointer;
+  display:flex;align-items:center;gap:9px;transition:.25s;
+  letter-spacing:.02em;
+}
+.btn-refresh:hover{background:var(--amber-bright);transform:translateY(-2px)}
+.btn-refresh:active{transform:translateY(0)}
+.btn-refresh svg{transition:transform .6s}
+.btn-refresh.spin svg{transform:rotate(360deg)}
+
+/* ===== OBJECTIVE / WORKFLOW GRID ===== */
+.info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
+.info-card{
+  background:var(--card);border:1px solid var(--line2);
+  border-radius:15px;padding:26px;transition:.25s;
+}
+.info-card:hover{border-color:var(--amber-dim);transform:translateY(-3px)}
+.info-card .ic-num{
+  font-family:'Bebas Neue';font-size:30px;color:var(--amber);line-height:1;
+}
+.info-card h3{font-size:17px;font-weight:600;margin:12px 0 8px;color:var(--text)}
+.info-card p{font-size:15px;color:var(--text-dim);line-height:1.65}
+
+/* ===== WORKFLOW STEPS ===== */
+.flow{display:flex;flex-wrap:wrap;gap:10px;align-items:stretch}
+.flow-step{
+  flex:1;min-width:140px;background:var(--card);
+  border:1px solid var(--line2);border-radius:13px;padding:18px 16px;
+  position:relative;
+}
+.flow-step .fs-n{font-family:'Bebas Neue';font-size:18px;color:var(--amber-dim)}
+.flow-step h4{font-size:15px;font-weight:600;margin:5px 0 4px}
+.flow-step p{font-size:13px;color:var(--text-mute);line-height:1.5}
+
+/* ===== TOP 3 CARDS ===== */
+.podium{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.p-card{
+  background:linear-gradient(160deg,var(--card2),var(--card));
+  border:1px solid var(--line2);border-radius:20px;
+  overflow:hidden;position:relative;transition:.3s;
+  display:flex;flex-direction:column;
+}
+.p-card:hover{transform:translateY(-6px);border-color:var(--amber-dim);box-shadow:var(--shadow)}
+.p-card.gold{border-color:rgba(224,168,78,.5)}
+.p-rank{
+  font-family:'Bebas Neue';font-size:90px;line-height:.8;
+  color:var(--amber);opacity:.18;position:absolute;top:14px;right:20px;
+}
+.p-card.gold .p-rank{opacity:.32}
+.p-body{padding:28px 26px;flex:1;display:flex;flex-direction:column}
+.p-medal{
+  font-size:12px;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--amber);font-weight:600;margin-bottom:10px;
+}
+.p-name{
+  font-family:'Noto Serif Thai',serif;font-size:22px;
+  font-weight:600;line-height:1.35;margin-bottom:6px;
+}
+.p-cat{font-size:14px;color:var(--text-mute);margin-bottom:18px}
+.p-score-big{display:flex;align-items:baseline;gap:6px;margin-bottom:20px}
+.p-score-big .n{font-family:'Bebas Neue';font-size:52px;color:var(--amber);line-height:1}
+.p-score-big .d{font-size:14px;color:var(--text-mute)}
+.p-bars{display:flex;flex-direction:column;gap:7px;margin-bottom:18px}
+.p-bar-row{display:grid;grid-template-columns:84px 1fr 30px;align-items:center;gap:9px}
+.p-bar-row .bl{font-size:11px;color:var(--text-mute)}
+.p-bar-track{height:5px;background:var(--bg);border-radius:3px;overflow:hidden}
+.p-bar-fill{height:100%;background:linear-gradient(90deg,var(--amber-dim),var(--amber));border-radius:3px}
+.p-bar-row .bv{font-size:11px;color:var(--text-dim);text-align:right}
+.p-why{
+  font-size:14.5px;color:var(--text-dim);line-height:1.65;
+  padding:16px 0;border-top:1px solid var(--line2);
+}
+.p-meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.chip{
+  font-size:11px;padding:4px 10px;border-radius:20px;
+  background:var(--bg2);border:1px solid var(--line2);color:var(--text-dim);
+}
+.chip.amber{border-color:var(--amber-dim);color:var(--amber)}
+.p-actions{margin-top:auto;display:flex;gap:9px}
+.p-map{
+  width:100%;height:150px;border:none;border-radius:11px;
+  margin-bottom:14px;filter:grayscale(.3) contrast(1.05);
+}
+.t-maplink{
+  display:inline-block;font-size:11px;padding:5px 11px;border-radius:8px;
+  background:var(--bg2);border:1px solid var(--line2);color:var(--text-dim);
+  text-decoration:none;transition:.2s;white-space:nowrap;
+}
+.t-maplink:hover{border-color:var(--amber-dim);color:var(--amber)}
+.p-btn{
+  flex:1;text-align:center;font-size:12.5px;padding:10px;
+  border-radius:9px;cursor:pointer;transition:.2s;font-weight:500;
+  border:1px solid var(--line2);background:var(--bg2);color:var(--text-dim);
+  text-decoration:none;
+}
+.p-btn:hover{border-color:var(--amber-dim);color:var(--amber)}
+.p-btn.primary{background:var(--amber);color:#1a1410;border-color:var(--amber);font-weight:600}
+.p-btn.primary:hover{background:var(--amber-bright);color:#1a1410}
+
+/* ===== REVIEW DRAWER ===== */
+.rev-drawer{display:none;padding:0 26px 24px}
+.rev-drawer.open{display:block;animation:fade .3s}
+@keyframes fade{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.rev-item{
+  background:var(--bg2);border:1px solid var(--line2);
+  border-radius:11px;padding:14px 16px;margin-bottom:10px;
+}
+.rev-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}
+.rev-stars{color:var(--amber);font-size:13px;letter-spacing:1px}
+.rev-date{font-size:11px;color:var(--text-mute)}
+.rev-text{font-size:14px;color:var(--text-dim);line-height:1.6}
+.rev-detail{display:flex;gap:12px;margin-top:8px}
+.rev-detail span{font-size:11px;color:var(--text-mute)}
+.rev-detail b{color:var(--amber-dim)}
+
+/* ===== FILTER + TABLE ===== */
+.filter-row{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:22px}
+.fbtn{
+  font-family:'Noto Sans Thai';font-size:13px;font-weight:400;
+  padding:9px 18px;border-radius:22px;cursor:pointer;transition:.2s;
+  background:var(--card);border:1px solid var(--line2);color:var(--text-dim);
+}
+.fbtn:hover{border-color:var(--amber-dim);color:var(--text)}
+.fbtn.active{background:var(--amber);color:#1a1410;border-color:var(--amber);font-weight:600}
+.fbtn .cnt{opacity:.6;font-size:11px;margin-left:4px}
+
+.table-wrap{
+  background:var(--card);border:1px solid var(--line2);
+  border-radius:16px;overflow:hidden;box-shadow:var(--shadow);
+}
+table{width:100%;border-collapse:collapse}
+thead th{
+  background:var(--bg2);font-size:12px;font-weight:600;
+  color:var(--text-mute);text-transform:uppercase;letter-spacing:.05em;
+  padding:15px 14px;text-align:left;cursor:pointer;user-select:none;
+  white-space:nowrap;transition:.15s;
+}
+thead th:hover{color:var(--amber)}
+thead th.num{text-align:right}
+thead th .arr{opacity:.4;font-size:9px;margin-left:3px}
+tbody td{padding:15px 14px;border-top:1px solid var(--line2);font-size:14.5px}
+tbody td.num{text-align:right;font-variant-numeric:tabular-nums}
+tbody tr{transition:.15s}
+tbody tr:hover{background:var(--card2)}
+.t-rank{
+  font-family:'Bebas Neue';font-size:21px;color:var(--amber-dim);width:38px;
+}
+tbody tr:nth-child(-n+3) .t-rank{color:var(--amber)}
+.t-name{font-weight:500;color:var(--text)}
+.t-name .tcat{font-size:12px;color:var(--text-mute);font-weight:300}
+.t-score{font-family:'Bebas Neue';font-size:20px;color:var(--amber)}
+.t-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:3px}
+.t-tag{font-size:10px;padding:2px 7px;border-radius:10px;background:var(--bg2);color:var(--text-mute);border:1px solid var(--line2)}
+.t-badge{font-size:11px;padding:3px 9px;border-radius:11px;display:inline-block}
+.t-badge.open{background:rgba(126,184,126,.12);color:var(--green);border:1px solid rgba(126,184,126,.3)}
+.t-badge.late{background:rgba(224,192,78,.1);color:var(--yellow);border:1px solid rgba(224,192,78,.3)}
+
+/* ===== SCORING MODEL ===== */
+.score-model{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px}
+.sm-card{
+  background:var(--card);border:1px solid var(--line2);
+  border-radius:14px;padding:20px;position:relative;overflow:hidden;
+}
+.sm-card .sm-w{
+  font-family:'Bebas Neue';font-size:40px;color:var(--amber);line-height:1;
+}
+.sm-card .sm-w span{font-size:16px;color:var(--text-mute)}
+.sm-card h4{font-size:14px;font-weight:600;margin:6px 0 7px}
+.sm-card p{font-size:12px;color:var(--text-mute);line-height:1.55}
+.sm-card .sm-track{height:4px;background:var(--bg);border-radius:2px;margin-top:12px;overflow:hidden}
+.sm-card .sm-fill{height:100%;background:var(--amber);border-radius:2px}
+
+/* ===== RECOMMENDER ===== */
+.rec-box{
+  background:linear-gradient(160deg,var(--card2),var(--card));
+  border:1px solid var(--line2);border-radius:20px;
+  padding:30px 28px;box-shadow:var(--shadow);
+}
+.rec-intro{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+.rec-avatar{
+  width:42px;height:42px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(140deg,var(--amber),var(--amber-dim));
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;
+}
+.rec-intro .ri-name{font-size:15px;font-weight:600;color:var(--text)}
+.rec-intro .ri-sub{font-size:12.5px;color:var(--text-mute)}
+.rec-label{font-size:13px;color:var(--text-dim);margin-bottom:11px}
+.rec-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.rec-chip{
+  font-family:'Noto Sans Thai';font-size:13px;
+  padding:8px 15px;border-radius:20px;cursor:pointer;transition:.2s;
+  background:var(--bg2);border:1px solid var(--line2);color:var(--text-dim);
+}
+.rec-chip:hover{border-color:var(--amber-dim);color:var(--text)}
+.rec-chip.on{background:var(--amber);color:#1a1410;border-color:var(--amber);font-weight:600}
+.rec-chip-group{margin-bottom:16px}
+.rec-chip-group .rcg-title{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-mute);margin-bottom:8px}
+.rec-ask{
+  width:100%;background:var(--amber);color:#1a1410;border:none;
+  font-family:'Noto Sans Thai';font-weight:600;font-size:14.5px;
+  padding:14px;border-radius:11px;cursor:pointer;transition:.2s;margin-top:4px;
+}
+.rec-ask:hover{background:var(--amber-bright)}
+.rec-answer{margin-top:22px;display:none}
+.rec-answer.show{display:block;animation:fade .35s}
+.rec-bubble{
+  background:var(--bg2);border:1px solid var(--line2);
+  border-radius:14px;border-top-left-radius:4px;
+  padding:16px 18px;font-size:14px;color:var(--text-dim);
+  line-height:1.65;margin-bottom:16px;
+}
+.rec-bubble b{color:var(--amber)}
+.rec-results{display:flex;flex-direction:column;gap:12px}
+.rec-result{
+  background:var(--card);border:1px solid var(--line2);
+  border-radius:13px;padding:16px 18px;display:flex;
+  align-items:center;gap:16px;transition:.2s;
+}
+.rec-result:hover{border-color:var(--amber-dim)}
+.rec-rscore{
+  font-family:'Bebas Neue';font-size:34px;color:var(--amber);
+  line-height:1;flex-shrink:0;width:54px;text-align:center;
+}
+.rec-rscore span{display:block;font-size:10px;color:var(--text-mute);font-family:'Noto Sans Thai'}
+.rec-rinfo{flex:1;min-width:0}
+.rec-rname{font-size:15px;font-weight:600;color:var(--text);margin-bottom:3px}
+.rec-rmeta{font-size:12.5px;color:var(--text-mute)}
+.rec-rwhy{font-size:12.5px;color:var(--amber-dim);margin-top:5px}
+.rec-rlink{
+  font-size:12px;color:var(--text-mute);text-decoration:none;flex-shrink:0;
+  border:1px solid var(--line2);padding:7px 12px;border-radius:8px;transition:.2s;
+}
+.rec-rlink:hover{border-color:var(--amber-dim);color:var(--amber)}
+.rec-empty{font-size:13.5px;color:var(--text-mute);font-style:italic}
+@media(max-width:600px){
+  .rec-result{flex-wrap:wrap}
+  .rec-rlink{width:100%;text-align:center}
+}
+
+/* ===== COMPARISON ===== */
+.cmp-wrap{
+  background:var(--card);border:1px solid var(--line2);
+  border-radius:16px;overflow:hidden;box-shadow:var(--shadow);
+}
+.cmp-wrap table{width:100%;border-collapse:collapse}
+.cmp-wrap thead th{
+  background:var(--bg2);font-size:12px;font-weight:600;color:var(--text-mute);
+  text-transform:uppercase;letter-spacing:.05em;padding:15px 16px;text-align:left;
+}
+.cmp-wrap tbody td{padding:16px;border-top:1px solid var(--line2);font-size:14.5px;vertical-align:top}
+.cmp-name{font-weight:600;color:var(--text);font-size:15.5px}
+.cmp-name .cn-cat{font-size:12.5px;color:var(--text-mute);font-weight:300;display:block;margin-top:2px}
+.cmp-pro{color:var(--text-dim);line-height:1.6}
+.cmp-pro::before{content:'▲ ';color:var(--green);font-size:9px}
+.cmp-con{color:var(--text-dim);line-height:1.6}
+.cmp-con::before{content:'▼ ';color:var(--yellow);font-size:9px}
+.cmp-wrap tbody tr:hover{background:var(--card2)}
+
+/* ===== DATA SOURCES ===== */
+.src-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px}
+.src-card{
+  background:var(--card);border:1px solid var(--line2);
+  border-radius:14px;padding:22px;
+}
+.src-card .sc-tag{
+  font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--amber);font-weight:600;
+}
+.src-card h4{font-size:17px;font-weight:600;margin:8px 0 6px;color:var(--text)}
+.src-card p{font-size:14.5px;color:var(--text-dim);line-height:1.6;margin-bottom:12px}
+.src-card a{
+  font-size:12.5px;color:var(--amber);text-decoration:none;
+  word-break:break-all;border-bottom:1px solid var(--amber-dim);
+}
+.src-card a:hover{color:var(--amber-bright)}
+@media(max-width:860px){.src-grid{grid-template-columns:1fr}}
+
+/* ===== TOOLS / SOURCES ===== */
+.tool-list{display:flex;flex-wrap:wrap;gap:10px}
+.tool{
+  background:var(--card);border:1px solid var(--line2);border-radius:11px;
+  padding:14px 18px;font-size:14.5px;color:var(--text-dim);
+  display:flex;align-items:center;gap:9px;
+}
+.tool b{color:var(--text);font-weight:600}
+.tool .td{width:6px;height:6px;border-radius:50%;background:var(--amber)}
+
+/* ===== FOOTER ===== */
+footer{
+  padding:50px 0 70px;border-top:1px solid var(--line2);
+  margin-top:40px;text-align:center;
+}
+footer .fl{font-family:'Bebas Neue';font-size:26px;color:var(--amber);letter-spacing:.04em}
+footer p{font-size:14px;color:var(--text-mute);margin-top:8px}
+
+.note{font-size:13px;color:var(--text-mute);font-style:italic;margin-top:14px}
+
+/* reveal anim */
+.reveal{opacity:0;transform:translateY(24px);transition:.7s cubic-bezier(.2,.7,.2,1)}
+.reveal.in{opacity:1;transform:none}
+
+@media(max-width:860px){
+  .podium{grid-template-columns:1fr}
+  .hero{padding:60px 0 40px}
+  .radar-bar{flex-direction:column;align-items:flex-start}
+  .table-wrap{overflow-x:auto}
+  table{min-width:680px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="hero-tag"><span class="radar-dot"></span> AI Workflow Project</div>
+    <h1 class="title">Thonglor<span class="amber">Dinner Radar</span></h1>
+    <p class="hero-sub serif">ระบบช่วยค้นหาร้านมื้อเย็นสำหรับทีม 8–12 คน ย่านทองหล่อ — จัดอันดับด้วยข้อมูลจริง ผ่านสูตรคะแนนที่โปร่งใสและตรวจสอบย้อนกลับได้</p>
+    <div class="hero-meta">
+      <div><div class="k">พื้นที่</div><div class="v">ทองหล่อ กรุงเทพฯ</div></div>
+      <div><div class="k">โอกาส</div><div class="v">มื้อเย็น · ทีม 8–12 คน</div></div>
+      <div><div class="k">ร้านที่วิเคราะห์</div><div class="v" id="m-total">184 ร้าน</div></div>
+      <div><div class="k">วันที่</div><div class="v" id="m-date">—</div></div>
+    </div>
+  </header>
+
+  <!-- RADAR STATUS -->
+  <section style="padding-top:20px">
+    <div class="radar-bar reveal">
+      <div class="radar-status">
+        <div class="radar-ring sweep"></div>
+        <div>
+          <div class="label">สถานะข้อมูล</div>
+          <div class="value" id="radar-fresh">ข้อมูลล่าสุด</div>
+        </div>
+      </div>
+      <div class="radar-info">
+        <div class="ri"><div class="k">ข้อมูล ณ</div><div class="v" id="radar-time">—</div></div>
+        <div class="ri"><div class="k">รีเฟรชเมื่อ</div><div class="v" id="radar-refreshed">—</div></div>
+        <div class="ri"><div class="k">แหล่งข้อมูล</div><div class="v">Google Maps</div></div>
+      </div>
+      <button class="btn-refresh" id="btnRefresh">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6M3 12a9 9 0 0 1 15-6.7L21 8M3 22v-6h6M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+        รีเฟรชข้อมูล
+      </button>
+    </div>
+    <p class="note">ข้อมูลถูกดึงและคำนวณใหม่อัตโนมัติทุก 3 ชั่วโมงผ่าน n8n — ปุ่มรีเฟรชดึงผลรอบล่าสุดจากฐานข้อมูล</p>
+  </section>
+
+  <!-- OBJECTIVE -->
+  <section>
+    <div class="sec-head"><span class="sec-num">01</span><h2 class="sec-title serif">โจทย์และวัตถุประสงค์</h2></div>
+    <div class="info-grid">
+      <div class="info-card reveal">
+        <div class="ic-num">?</div>
+        <h3>ปัญหา</h3>
+        <p>การหาร้านมื้อเย็นสำหรับทีมขนาด 8–12 คนใช้เวลานาน ต้องเทียบหลายปัจจัยพร้อมกัน — คะแนน ราคา การเดินทาง ความเหมาะกับกลุ่ม</p>
+      </div>
+      <div class="info-card reveal">
+        <div class="ic-num">→</div>
+        <h3>แนวทาง</h3>
+        <p>ดึงข้อมูลร้านจริงจาก Google Maps มาทำความสะอาด จัดหมวด แล้วให้คะแนนผ่านสูตร 6 ด้าน คำนวณซ้ำได้ ตรวจสอบที่มาได้ทุกตัวเลข</p>
+      </div>
+      <div class="info-card reveal">
+        <div class="ic-num">✓</div>
+        <h3>ผลลัพธ์</h3>
+        <p>อันดับร้านมื้อเย็น Top 10 พร้อมเหตุผลเชิงลึกของ Top 3 — อัปเดตอัตโนมัติ ใช้ตัดสินใจได้ทันที</p>
+      </div>
+      <div class="info-card reveal">
+        <div class="ic-num">⚖</div>
+        <h3>เกณฑ์ตัดสินใจ</h3>
+        <p>6 เกณฑ์เลือกจากบริบทจริง — เป็นกลุ่มใหญ่ จึงให้น้ำหนัก "ความเหมาะกับกลุ่ม" / มื้อเย็นหลังเลิกงาน จึงนับ "การเดินทางจาก BTS" / งบทีมมีกรอบ จึงวัด "ความเหมาะของราคา"</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- WORKFLOW -->
+  <section>
+    <div class="sec-head"><span class="sec-num">02</span><h2 class="sec-title serif">ขั้นตอนการทำงานของระบบ</h2></div>
+    <div class="flow">
+      <div class="flow-step reveal"><div class="fs-n">A</div><h4>Data Collection</h4><p>Apify ดึงร้านจาก Google Maps ผ่าน 8 query ประเภทร้าน</p></div>
+      <div class="flow-step reveal"><div class="fs-n">B</div><h4>Data Cleaning</h4><p>รวมข้อมูล ตัดร้านซ้ำ แตกเวลาเปิด-ปิด</p></div>
+      <div class="flow-step reveal"><div class="fs-n">C</div><h4>Categorization</h4><p>AI จัดร้านเข้า 7 หมวด เช่น Japanese, Thai, Korean + แท็กรูปแบบกิน เช่น Buffet, ชาบู</p></div>
+      <div class="flow-step reveal"><div class="fs-n">D</div><h4>Scoring</h4><p>สูตร 6 ด้าน 100 คะแนน จัดอันดับ</p></div>
+      <div class="flow-step reveal"><div class="fs-n">E</div><h4>Output</h4><p>เขียนลง Google Sheets แสดงบนหน้านี้</p></div>
+    </div>
+    <p class="note">การให้คะแนนทั้งหมดเป็นสูตรคำนวณ ไม่ใช้ AI ตัดสิน — AI ทำหน้าที่เฉพาะการจัดหมวดร้านเท่านั้น เพื่อให้ผลลัพธ์คงที่และตรวจสอบได้</p>
+  </section>
+
+  <!-- TOP 3 -->
+  <section>
+    <div class="sec-head"><span class="sec-num">03</span><h2 class="sec-title serif">3 อันดับแนะนำ</h2></div>
+    <p class="sec-desc">วิเคราะห์เชิงลึกจากคะแนนแยกหมวดและรีวิวลูกค้าจริง — กดดูรีวิวและเหตุผลของแต่ละร้านได้</p>
+    <div class="podium" id="podium"></div>
+    <p class="note">บทวิเคราะห์และรีวิวเป็นภาพ ณ รอบที่จัดทำรายงาน — ตาราง Top 10 ด้านล่างอัปเดตตามรอบคำนวณล่าสุด</p>
+  </section>
+
+  <!-- AI RECOMMENDER -->
+  <section>
+    <div class="sec-head"><span class="sec-num">04</span><h2 class="sec-title serif">ผู้ช่วยแนะนำร้าน</h2></div>
+    <p class="sec-desc">บอกเงื่อนไขที่ทีมต้องการ — ระบบจะคัดร้านที่ตรงที่สุดจากทั้ง 184 ร้านในฐานข้อมูล พร้อมเหตุผล</p>
+    <div class="rec-box">
+      <div class="rec-intro">
+        <div class="rec-avatar">🍽️</div>
+        <div>
+          <div class="ri-name">Dinner Radar Assistant</div>
+          <div class="ri-sub">เลือกเงื่อนไขด้านล่าง แล้วกดหาร้าน</div>
+        </div>
+      </div>
+
+      <div class="rec-chip-group">
+        <div class="rcg-title">อยากกินแนวไหน</div>
+        <div class="rec-chips" id="rc-cat">
+          <span class="rec-chip" data-v="Japanese">ญี่ปุ่น</span>
+          <span class="rec-chip" data-v="Thai">ไทย</span>
+          <span class="rec-chip" data-v="Korean">เกาหลี</span>
+          <span class="rec-chip" data-v="Chinese">จีน</span>
+          <span class="rec-chip" data-v="Italian">อิตาเลียน</span>
+          <span class="rec-chip" data-v="Steakhouse">สเต๊ก</span>
+        </div>
+      </div>
+
+      <div class="rec-chip-group">
+        <div class="rcg-title">รูปแบบการกิน</div>
+        <div class="rec-chips" id="rc-tag">
+          <span class="rec-chip" data-v="Buffet">บุฟเฟต์</span>
+          <span class="rec-chip" data-v="Hotpot/Shabu">หม้อไฟ / ชาบู</span>
+          <span class="rec-chip" data-v="Yakiniku/BBQ">ปิ้งย่าง</span>
+        </div>
+      </div>
+
+      <div class="rec-chip-group">
+        <div class="rcg-title">งบต่อหัว</div>
+        <div class="rec-chips" id="rc-budget">
+          <span class="rec-chip" data-v="lo">ประหยัด (ไม่เกิน 400)</span>
+          <span class="rec-chip" data-v="mid">ปานกลาง (400–800)</span>
+          <span class="rec-chip" data-v="hi">ไม่จำกัด</span>
+        </div>
+      </div>
+
+      <div class="rec-chip-group">
+        <div class="rcg-title">เงื่อนไขเพิ่มเติม</div>
+        <div class="rec-chips" id="rc-extra">
+          <span class="rec-chip" data-v="near">ใกล้ BTS (ไม่เกิน 600 ม.)</span>
+          <span class="rec-chip" data-v="late">เปิดถึงดึก</span>
+        </div>
+      </div>
+
+      <button class="rec-ask" id="recAsk">หาร้านที่เหมาะกับทีม</button>
+
+      <div class="rec-answer" id="recAnswer">
+        <div class="rec-bubble" id="recBubble"></div>
+        <div class="rec-results" id="recResults"></div>
+      </div>
+    </div>
+    <p class="note">ระบบคัดเลือกจากคะแนนจริงในฐานข้อมูล — เรียงตามคะแนนรวมของร้านที่ตรงเงื่อนไข ไม่ใช่การสุ่มหรือความเห็นส่วนตัว</p>
+  </section>
+
+  <!-- TOP 10 TABLE -->
+  <section>
+    <div class="sec-head"><span class="sec-num">05</span><h2 class="sec-title serif">ตารางจัดอันดับ Top 10</h2></div>
+    <p class="sec-desc">กรองตามประเภทอาหาร หรือกดหัวคอลัมน์เพื่อจัดเรียง — ทุกคะแนนมาจากสูตรในเอกสารคำนวณ</p>
+    <div class="filter-row" id="filters"></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th class="num" data-sort="rank">#</th>
+          <th data-sort="name">ร้าน</th>
+          <th class="num" data-sort="rating">คะแนนรีวิว <span class="arr">▾</span></th>
+          <th class="num" data-sort="price">ราคา/หัว <span class="arr">▾</span></th>
+          <th class="num" data-sort="dist">ระยะ BTS <span class="arr">▾</span></th>
+          <th data-sort="status">สถานะ</th>
+          <th class="num" data-sort="total">คะแนนรวม <span class="arr">▾</span></th>
+          <th>แผนที่</th>
+        </tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <p class="note" id="table-count">—</p>
+  </section>
+
+  <!-- RESTAURANT COMPARISON -->
+  <section>
+    <div class="sec-head"><span class="sec-num">06</span><h2 class="sec-title serif">เปรียบเทียบร้านเด่น</h2></div>
+    <p class="sec-desc">จุดเด่นและข้อควรระวังของ 5 อันดับแรก — ทุกร้านมีจุดแข็ง แต่ก็มี trade-off ที่ทีมควรรู้ก่อนตัดสินใจ</p>
+    <div class="cmp-wrap">
+      <table>
+        <thead><tr><th style="width:22%">ร้าน</th><th style="width:39%">จุดเด่น</th><th style="width:39%">ข้อควรระวัง</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><div class="cmp-name">HITORI SHABU<span class="cn-cat">อันดับ 1 · Japanese · 93.7</span></div></td>
+            <td class="cmp-pro">คะแนนสูงสม่ำเสมอทุกด้าน เรตติ้ง 4.8 สูงสุดใน Top 3 ชาบูเป็นรูปแบบที่ทีมแชร์หม้อร่วมกัน คุยกันได้ทั้งโต๊ะ</td>
+            <td class="cmp-con">อยู่ใน Marché Thonglor ช่วงมื้อเย็นคนเยอะ ควรจองล่วงหน้าสำหรับกลุ่ม</td>
+          </tr>
+          <tr>
+            <td><div class="cmp-name">Baan Ice<span class="cn-cat">อันดับ 2 · Thai · 92.7</span></div></td>
+            <td class="cmp-pro">ราคาคุ้มที่สุดใน Top 3 (~600 บาท/หัว) ฐานรีวิวใหญ่สุด เมนูไทยกว้าง ทุกคนในทีมหาของถูกปากได้</td>
+            <td class="cmp-con">เป็นร้านยอดนิยม รีวิวเยอะ = คนเยอะ ช่วง peak อาจต้องรอคิว</td>
+          </tr>
+          <tr>
+            <td><div class="cmp-name">KhuaKling PakSod<span class="cn-cat">อันดับ 3 · Thai · 92.1</span></div></td>
+            <td class="cmp-pro">อาหารใต้เอกลักษณ์ชัด เป็นตัวเลือกที่ต่างจากร้านทั่วไป รีวิวหลายภาษาชมความ authentic</td>
+            <td class="cmp-con">อาหารใต้รสจัด/เผ็ด ถ้าในทีมมีคนกินเผ็ดไม่ได้ควรเช็กก่อน หรือสั่งเมนูไม่เผ็ดเผื่อ</td>
+          </tr>
+          <tr>
+            <td><div class="cmp-name">You&amp;I Premium Suki Buffet<span class="cn-cat">อันดับ 4 · Japanese · 91.8</span></div></td>
+            <td class="cmp-pro">บุฟเฟต์ชาบู คุมงบง่าย ทุกคนจ่ายเท่ากัน ไม่ต้องคิดเลขแบ่งบิล เหมาะกับทีมใหญ่</td>
+            <td class="cmp-con">รูปแบบบุฟเฟต์ทำให้ตัวเลือกเมนูถูกจำกัดอยู่ในสิ่งที่ร้านจัดให้</td>
+          </tr>
+          <tr>
+            <td><div class="cmp-name">BABA @Marché Thonglor<span class="cn-cat">อันดับ 5 · Other (Indian) · 91.0</span></div></td>
+            <td class="cmp-pro">อาหารอินเดียรสจัดจ้าน เป็นประสบการณ์ที่จดจำได้ ข้อมูลร้านครบ เรตติ้งสูง</td>
+            <td class="cmp-con">อาหารอินเดียมีเครื่องเทศเข้มข้น อาจไม่ถูกปากทุกคน ควรเช็กรสนิยมทีมก่อน</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- SCORING MODEL moved to 06 -->
+  <section>
+    <div class="sec-head"><span class="sec-num">07</span><h2 class="sec-title serif">เกณฑ์การให้คะแนน</h2></div>
+    <p class="sec-desc">คะแนนเต็ม 100 แบ่ง 6 ด้าน น้ำหนักตามที่โจทย์กำหนด — แต่ละด้านเป็นสูตรคำนวณที่อธิบายที่มาได้</p>
+    <div class="score-model">
+      <div class="sm-card reveal"><div class="sm-w">25</div><h4>คะแนนรีวิว</h4><p>เรตติ้ง × จำนวนรีวิว (ปรับสเกลลอการิทึม)</p><div class="sm-track"><div class="sm-fill" style="width:100%"></div></div></div>
+      <div class="sm-card reveal"><div class="sm-w">20</div><h4>เหมาะกับกลุ่ม</h4><p>รองรับกลุ่มใหญ่ + รับจองโต๊ะ</p><div class="sm-track"><div class="sm-fill" style="width:80%"></div></div></div>
+      <div class="sm-card reveal"><div class="sm-w">15</div><h4>ราคาเหมาะสม</h4><p>ช่วง 300–800 บาท/หัว ได้เต็ม</p><div class="sm-track"><div class="sm-fill" style="width:60%"></div></div></div>
+      <div class="sm-card reveal"><div class="sm-w">15</div><h4>การเดินทาง</h4><p>ระยะจาก BTS ทองหล่อ ยิ่งใกล้ยิ่งสูง</p><div class="sm-track"><div class="sm-fill" style="width:60%"></div></div></div>
+      <div class="sm-card reveal"><div class="sm-w">15</div><h4>ความครบข้อมูล</h4><p>สัดส่วนข้อมูลสำคัญที่ร้านมีครบ</p><div class="sm-track"><div class="sm-fill" style="width:60%"></div></div></div>
+      <div class="sm-card reveal"><div class="sm-w">10</div><h4>เอกลักษณ์</h4><p>จุดเด่นเฉพาะตัว ความน่าจดจำ</p><div class="sm-track"><div class="sm-fill" style="width:40%"></div></div></div>
+    </div>
+  </section>
+
+  <!-- DATA SOURCES -->
+  <section>
+    <div class="sec-head"><span class="sec-num">08</span><h2 class="sec-title serif">แหล่งข้อมูล</h2></div>
+    <p class="sec-desc">ข้อมูลทั้งหมดมาจาก 2 แหล่งที่ตรวจสอบย้อนกลับได้ ดึงผ่าน Apify — ไม่ใช้ความรู้ทั่วไปของ AI</p>
+    <div class="src-grid">
+      <div class="src-card reveal">
+        <div class="sc-tag">แหล่งที่ 1 · ข้อมูลร้าน</div>
+        <h4>Google Maps Places</h4>
+        <p>ข้อมูลพื้นฐานของร้าน — ชื่อ ประเภท พิกัด เรตติ้งรวม จำนวนรีวิว ช่วงราคา เวลาเปิด-ปิด การรองรับกลุ่ม เป็นข้อมูลฝั่งร้าน/แพลตฟอร์ม</p>
+        <a href="https://www.google.com/maps" target="_blank" rel="noopener">google.com/maps</a>
+      </div>
+      <div class="src-card reveal">
+        <div class="sc-tag">แหล่งที่ 2 · เสียงลูกค้า</div>
+        <h4>Google Maps Reviews</h4>
+        <p>รีวิวจากลูกค้าจริง 2,269 รายการ — ข้อความรีวิว ดาวรายคน คะแนนแยกด้านอาหาร/บริการ/บรรยากาศ วันที่รีวิว เป็นข้อมูล user-generated ที่ cross-check กับข้อมูลร้านได้</p>
+        <a href="https://www.google.com/maps" target="_blank" rel="noopener">google.com/maps · reviews</a>
+      </div>
+    </div>
+    <p class="note">ทั้งสองแหล่งเก็บผ่าน Apify actor (compass/crawler-google-places) — ดูหลักฐานการ scrape ใน dataset export ที่แนบส่ง</p>
+  </section>
+
+  <!-- TOOLS -->
+  <section>
+    <div class="sec-head"><span class="sec-num">09</span><h2 class="sec-title serif">เครื่องมือที่ใช้</h2></div>
+    <div class="tool-list">
+      <div class="tool reveal"><span class="td"></span><b>Apify</b> · ดึงข้อมูล Google Maps</div>
+      <div class="tool reveal"><span class="td"></span><b>OpenAI API</b> · จัดหมวดร้าน</div>
+      <div class="tool reveal"><span class="td"></span><b>n8n</b> · ทำงานอัตโนมัติทุก 3 ชม.</div>
+      <div class="tool reveal"><span class="td"></span><b>Google Sheets</b> · ฐานข้อมูล</div>
+      <div class="tool reveal"><span class="td"></span><b>HTML / CSS / JS</b> · หน้าแสดงผล</div>
+    </div>
+    <p class="note">เครื่องมือทั้งหมดตรงกับหลักฐานที่แนบส่ง — workflow JSON, prompt history, dataset export</p>
+  </section>
+
+  <footer>
+    <div class="fl">THONGLOR DINNER RADAR</div>
+    <p>AI Workflow Exam Project · จัดทำโดย AuDz · พฤษภาคม 2026</p>
+  </footer>
+
+</div>
+
+<script>
+const DATA = {"top10":[{"rank":1,"name":"HITORI SHABU สาขา Marché Thonglor","cat":"Japanese","tags":"Hotpot/Shabu","rating":4.8,"reviews":1277,"price":900,"price_src":"scraped","dist":520,"total":93.7,"sr":23.8,"sg":20,"sp":13.9,"st":11,"sd":15.0,"su":10,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=HITORI%20SHABU%20%E0%B8%AA%E0%B8%B2%E0%B8%82%E0%B8%B2%20March%C3%A9%20Thonglor&query_place_id=ChIJ_Ulwh2ef4jAR6Pxj_eK0H4Q","lat":13.7288572,"lng":100.581218,"review_list":[{"stars":5,"text":"บริการดี อาหารอร่อยมากคับ","food":5,"service":5,"atmos":5,"date":"2026-05-26"},{"stars":5,"text":"Good","food":5,"service":5,"atmos":5,"date":"2026-05-25"},{"stars":5,"text":"อร่อย เนื้อสด นุ่ม น้ำซุปดี พนง.ดี","food":5,"service":5,"atmos":5,"date":"2026-05-25"},{"stars":5,"text":"High quality and so yummy with good atmosphere","food":5,"service":5,"atmos":5,"date":"2026-05-24"},{"stars":5,"text":"good experience with premium shabu","food":5,"service":5,"atmos":5,"date":"2026-05-24"}]},{"rank":2,"name":"Baan Ice","cat":"Thai","tags":"","rating":4.6,"reviews":1864,"price":600,"price_src":"scraped","dist":540,"total":92.7,"sr":23.7,"sg":20,"sp":15,"st":11,"sd":15.0,"su":8,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Baan%20Ice&query_place_id=ChIJKaihd6yf4jARJboSwdnH7sw","lat":13.7290537,"lng":100.580688,"review_list":[{"stars":5,"text":"อาหารยังคงอร่อยเหมือนเดิม พนักงานบริการดี และ สุขภาพ","food":"","service":"","atmos":"","date":"2026-05-26"},{"stars":5,"text":"พนักงานบริการดีมากค่ะ","food":5,"service":5,"atmos":5,"date":"2026-05-26"},{"stars":5,"text":"อร่อยเหมือนเดิม","food":5,"service":5,"atmos":4,"date":"2026-05-26"},{"stars":4,"text":"หัวหน้าพนักงานให้คำแนะนำที่ดีกับลูกค้า","food":5,"service":5,"atmos":5,"date":"2026-05-26"},{"stars":5,"text":"อร่อย","food":5,"service":5,"atmos":5,"date":"2026-05-26"}]},{"rank":3,"name":"KhuaKling PakSod Thong Lo","cat":"Thai","tags":"","rating":4.5,"reviews":1505,"price":800,"price_src":"scraped","dist":563,"total":92.1,"sr":23.1,"sg":20,"sp":15,"st":11,"sd":15.0,"su":8,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=KhuaKling%20PakSod%20Thong%20Lo&query_place_id=ChIJe26gkKuf4jARIiXTKzB4REo","lat":13.7290521,"lng":100.579305,"review_list":[{"stars":5,"text":"The southern Thai cuisine here is absolutely delicious and authentic. It's easy to request changes, like swapping crab for other meats if you prefer. We truly enjoyed every bite","food":4,"service":5,"atmos":5,"date":"2026-05-24"},{"stars":4,"text":"First time trying Southern-Thai style dishes which for me, is quite spicy and hot. Khua Kling Moo Sab (Minced Pork fried in curry with vegetable) is quite tempting hot but you can taste the complexity of the spices. Another nice dish is the","food":4,"service":3,"atmos":4,"date":"2026-05-21"},{"stars":5,"text":"Literally the best green chicken curry i've ever had... and the pat seew noodles were so good too🙏","food":5,"service":5,"atmos":5,"date":"2026-05-17"},{"stars":5,"text":"どのお料理も美味しくいただきました。\nオーセンティックで落ち着いたお店の雰囲気もとても良いです。","food":5,"service":4,"atmos":4,"date":"2026-05-17"},{"stars":5,"text":"อาหารรสชาติจัดจ้าน ตามสไตล์อาหารใต้\nถ้าคนชอบทานเผ็ดแนะนำ","food":5,"service":5,"atmos":5,"date":"2026-05-09"}]},{"rank":4,"name":"You&I Premium Suki Buffet Marché Thonglor 2nd Floor","cat":"Japanese","tags":"Buffet; Hotpot/Shabu","rating":4.8,"reviews":583,"price":700,"price_src":"scraped","dist":479,"total":91.8,"sr":22.8,"sg":20,"sp":15,"st":11,"sd":15.0,"su":8,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=You%26I%20Premium%20Suki%20Buffet%20March%C3%A9%20Thonglor%202nd%20Floor&query_place_id=ChIJxXLrTF2f4jARQ5rNYsm0jvc","lat":13.7284538,"lng":100.5814707,"review_list":[{"stars":5,"text":"So delicious. Recommend it . Thanks for amazing service of  Manager Bee and Marché team.","food":5,"service":5,"atmos":5,"date":"2026-05-16"},{"stars":5,"text":"พนักงานดูแลเอาใจใส่ดีทุกคน","food":5,"service":5,"atmos":5,"date":"2026-05-11"},{"stars":4,"text":"It’s a chain restaurant so I expected it would be the same as other branches but it’s a bit lacklustre compared to the ones at CentralWorld and EmQuartier. It’s a little harder to move around and ask for service due to the layout and the si","food":4,"service":3,"atmos":3,"date":"2026-05-05"},{"stars":5,"text":"Good food and nice atmosphere. The staff were friendly and service was quite fast. Prices are reasonable for the quality. Overall, a good place to eat. I would come back again.","food":"","service":"","atmos":"","date":"2026-04-24"},{"stars":5,"text":"Love the vibes. The food was great tasted fresh. Love the dessert. Lovely experience. Would come again and would recommend","food":5,"service":5,"atmos":5,"date":"2026-04-24"}]},{"rank":5,"name":"BABA (बाबा) @Marché Thonglor","cat":"Other","tags":"Buffet","rating":4.8,"reviews":334,"price":800,"price_src":"scraped","dist":462,"total":91.0,"sr":22.0,"sg":20,"sp":15,"st":11,"sd":15.0,"su":8,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=BABA%20(%E0%A4%AC%E0%A4%BE%E0%A4%AC%E0%A4%BE)%20%40March%C3%A9%20Thonglor&query_place_id=ChIJifNLs1Of4jAR3H6h56ZMF-E","lat":13.728343,"lng":100.5810975,"review_list":[{"stars":5,"text":"Really good food and very healthy! Loved it","food":5,"service":5,"atmos":5,"date":"2026-05-19"},{"stars":5,"text":"Walked almost a whole block before we found this restaurant. My friend said it was absolutely worth it. The very first bite made me pull up its Google rating right away—it’s just that good, a flavor that hits straight to the soul. The chick","food":5,"service":5,"atmos":5,"date":"2026-05-15"},{"stars":5,"text":"Indian restaurant located inside a mall. There was only me there for lunch. Food was tasty and staff were great. Hope to see it to be more busier.","food":5,"service":5,"atmos":5,"date":"2026-05-06"},{"stars":5,"text":"อาหารอร่อย ร้านสวย สะอาดมากค่ะ","food":5,"service":5,"atmos":5,"date":"2026-05-02"},{"stars":4,"text":"Love the food here. Portion is good. Recommended to finish your meal with gulab jamun & ice cream.","food":5,"service":5,"atmos":4,"date":"2026-04-27"}]},{"rank":6,"name":"FUWANG HOT POT • TEA HOUSE 富王火锅 茶馆","cat":"Chinese","tags":"Hotpot/Shabu","rating":4.8,"reviews":589,"price":1000,"price_src":"scraped","dist":483,"total":89.6,"sr":22.8,"sg":20,"sp":12.8,"st":11,"sd":15.0,"su":8,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=FUWANG%20HOT%20POT%20%E2%80%A2%20TEA%20HOUSE%20%E5%AF%8C%E7%8E%8B%E7%81%AB%E9%94%85%20%E8%8C%B6%E9%A6%86&query_place_id=ChIJh4-50VOf4jARSY4VbZwsTrA","lat":13.728512,"lng":100.5813645,"review_list":[{"stars":5,"text":"อร่อย","food":5,"service":5,"atmos":5,"date":"2026-04-15"},{"stars":5,"text":"🍲✨ Fuwang Hotpot & Teahouse – ฮอทพอทพรีเมียมที่ไม่ได้มีแค่เซตใหญ่สำหรับหลายคน แต่ตอนนี้มี Set Menu ที่เข้าถึงง่ายขึ้นมาก\n\nFuwang Hotpot & Teahouse คือร้านฮอทพอทพรีเมียมที่รวมวัตถุดิบนำเข้าจากหลายประเทศไว้แบบจัดเต็ม ทั้งเนื้อญี่ปุ่น เนื้อออส","food":5,"service":5,"atmos":5,"date":"2026-04-09"},{"stars":4,"text":"Đắt","food":4,"service":4,"atmos":4,"date":"2026-02-22"},{"stars":4,"text":"タイで美味しいシャブシャブが食べれます。\n\n高級店ではありますがクオリティと量を考えたら\nそこまで高くは感じません。\n\n和牛と普通の肉を食べ比べましたが\nそこまで変わらない感じです。\n\n広い店内でゆっくり出来るのが良いですね。","food":4,"service":5,"atmos":4,"date":"2026-01-17"},{"stars":4,"text":"ซุบคอลลาเจนอร่อย รสชาติดีค่ะ\nผักสดสะอาด  จะกลับมากินใหม่ค่ะ","food":5,"service":5,"atmos":5,"date":"2026-01-04"}]},{"rank":7,"name":"9Nine Korean Restaurant","cat":"Korean","tags":"","rating":4.9,"reviews":1046,"price":1100,"price_src":"scraped","dist":472,"total":89.4,"sr":23.8,"sg":20,"sp":11.6,"st":11,"sd":15.0,"su":8,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=9Nine%20Korean%20Restaurant&query_place_id=ChIJs2v_ZfCf4jAR345T39kaqeI","lat":13.7283967,"lng":100.581468,"review_list":[{"stars":5,"text":"อาหารอร่อยทุกอย่าง เครื่องเคียงดีมากค่ะ","food":5,"service":5,"atmos":5,"date":"2026-05-26"},{"stars":5,"text":"อาหารอร่อย","food":5,"service":5,"atmos":5,"date":"2026-05-26"},{"stars":5,"text":"So good อร่อยมากครับ","food":5,"service":5,"atmos":5,"date":"2026-05-19"},{"stars":5,"text":"อาหารอร่อยมาก พนักงานบริการดีสุดสุด","food":5,"service":5,"atmos":5,"date":"2026-05-18"},{"stars":5,"text":"เป็นร้านปิ้งย่างสไตล์เกาหลีพรีเมียมแบบอะลาคาส ราคาอาจจะดูสูง แต่พอมาลองทานถึงได้รู้ว่าจริงๆปริมาณและคุณภาพดีเลย ถ้าสั่งเมนูย่าง ก็จะมีเครื่องเคียงมาให้ครบ แถมยังมีพนักงานคอยย่างและตัดให้เรียบร้อยพร้อมทาน ตัวดูดควันทำงานดี ทำให้ไม่มีกลิ่นรบก","food":5,"service":5,"atmos":5,"date":"2026-05-17"}]},{"rank":8,"name":"Krua Jiang Mai","cat":"Thai","tags":"","rating":4.8,"reviews":2714,"price":300,"price_src":"scraped","dist":668,"total":89.4,"sr":24.4,"sg":20,"sp":15,"st":7,"sd":15.0,"su":8,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Krua%20Jiang%20Mai&query_place_id=ChIJh7s6GVOe4jAReTmapQOwBQ0","lat":13.7301922,"lng":100.5811893,"review_list":[{"stars":5,"text":"ร้านบรรยากาศดีมาก อาหารให้เลือกเยอะ พนักงานบริการดี","food":5,"service":5,"atmos":5,"date":"2026-05-26"},{"stars":5,"text":"มากินคนทั้งที่ 2 แล้ว อร่อยมากค่ะ","food":5,"service":5,"atmos":5,"date":"2026-05-26"},{"stars":5,"text":"トンローで美味しいカオソイを求めて、やってきました。\n場所も大通りぞいでわかりやすく、1人でも入りやすいお店でした。\n辛さも聞いてもらえて、ちょうどよいからさでとてもおいしかったです。","food":5,"service":5,"atmos":5,"date":"2026-05-26"},{"stars":5,"text":"Jeng 非常正宗嘅泰式風味 去完臘腸狗Cafe值得再食一餐 yumm yummm","food":5,"service":5,"atmos":5,"date":"2026-05-26"},{"stars":5,"text":"너무 맛있어요.. 치앙마이가 떠오르는 음식 맛 입니다,, 방콕에서 먹은 카오소이 중에 젤 맛났어요 🫶 파파야샐러드도 넘 좋았네요 스프링롤도 ..","food":5,"service":5,"atmos":5,"date":"2026-05-25"}]},{"rank":9,"name":"AUDREY CAFE & BISTRO","cat":"Other","tags":"Buffet","rating":4.2,"reviews":1177,"price":800,"price_src":"scraped","dist":974,"total":88.9,"sr":21.9,"sg":20,"sp":15,"st":7,"sd":15.0,"su":10,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=AUDREY%20CAFE%20%26%20BISTRO&query_place_id=ChIJx9vXV1Oe4jARxblHEzTi5Pk","lat":13.7329413,"lng":100.5802337,"review_list":[{"stars":4,"text":"พนักงานบริการดี แนะนำอาหารดีค่ะ เสริฟอาหารไว","food":4,"service":5,"atmos":5,"date":"2026-05-24"},{"stars":3,"text":"ไม่ได้ไปนานมาก...จำได้ละ รสชาติไม่ประทับใจ... งานห้องจัดเลี้ยง แอร์ไม่เย็น ไม่มี พนง ประจำดูแล รสชาติธรรมดา","food":3,"service":3,"atmos":3,"date":"2026-05-20"},{"stars":2,"text":"French fried ไม่ทอดใหม่ เอาไปทอดซ้ำเห็นๆ อาหารง่ายๆ ออกหลังสุด","food":2,"service":3,"atmos":4,"date":"2026-05-02"},{"stars":5,"text":"ร้านบรรยากาศดี อาหารอร่อย พนักงานใส่ใจที่จะบริการ ควรมาเป็นกลุ่มเพื่อจะได้ทานอาหารที่หลากหลาย","food":5,"service":5,"atmos":5,"date":"2026-04-15"},{"stars":5,"text":"Great place, nice and friendly Staff. Food tasted great.","food":5,"service":5,"atmos":5,"date":"2026-04-11"}]},{"rank":10,"name":"TUBA Bar & Restaurant","cat":"Thai","tags":"Buffet","rating":4.8,"reviews":3924,"price":600,"price_src":"scraped","dist":1786,"total":88.4,"sr":24.4,"sg":20,"sp":15,"st":4,"sd":15.0,"su":10,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=TUBA%20Bar%20%26%20Restaurant&query_place_id=ChIJJyqGlK-f4jARNBb_DKd3nV4","lat":13.7384166,"lng":100.5884871,"review_list":[{"stars":5,"text":"พิซซ่าอร่อย😋","food":5,"service":5,"atmos":5,"date":"2026-05-26"},{"stars":5,"text":"อาหารอร่อยบรรยากาศดี","food":5,"service":5,"atmos":5,"date":"2026-05-26"},{"stars":5,"text":"ชมน้องฉลามค่ะ บริการสุดยอด ครบจบมาก พึ่งพาได้ คำแนะนำดีมาก the night was perfect thanks to him. He’s super proactive, thoughtful and just amazingly supportive. If there’s an employee of the month award / recognition he should get it","food":5,"service":5,"atmos":5,"date":"2026-05-23"},{"stars":5,"text":"Great atmosphere! Recommend","food":5,"service":5,"atmos":5,"date":"2026-05-23"},{"stars":5,"text":"Good vibes, good food, suitable for friends","food":5,"service":5,"atmos":5,"date":"2026-05-22"}]}],"all":[{"rank":1,"name":"HITORI SHABU สาขา Marché Thonglor","cat":"Japanese","tags":"Hotpot/Shabu","rating":4.8,"reviews":1277,"price":900,"price_src":"scraped","dist":520,"total":93.7,"sr":23.8,"sg":20,"sp":13.9,"st":11,"sd":15.0,"su":10,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=HITORI%20SHABU%20%E0%B8%AA%E0%B8%B2%E0%B8%82%E0%B8%B2%20March%C3%A9%20Thonglor&query_place_id=ChIJ_Ulwh2ef4jAR6Pxj_eK0H4Q","lat":13.7288572,"lng":100.581218},{"rank":2,"name":"Baan Ice","cat":"Thai","tags":"","rating":4.6,"reviews":1864,"price":600,"price_src":"scraped","dist":540,"total":92.7,"sr":23.7,"sg":20,"sp":15,"st":11,"sd":15.0,"su":8,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Baan%20Ice&query_place_id=ChIJKaihd6yf4jARJboSwdnH7sw","lat":13.7290537,"lng":100.580688},{"rank":3,"name":"KhuaKling PakSod Thong Lo","cat":"Thai","tags":"","rating":4.5,"reviews":1505,"price":800,"price_src":"scraped","dist":563,"total":92.1,"sr":23.1,"sg":20,"sp":15,"st":11,"sd":15.0,"su":8,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=KhuaKling%20PakSod%20Thong%20Lo&query_place_id=ChIJe26gkKuf4jARIiXTKzB4REo","lat":13.7290521,"lng":100.579305},{"rank":4,"name":"You&I Premium Suki Buffet Marché Thonglor 2nd Floor","cat":"Japanese","tags":"Buffet; Hotpot/Shabu","rating":4.8,"reviews":583,"price":700,"price_src":"scraped","dist":479,"total":91.8,"sr":22.8,"sg":20,"sp":15,"st":11,"sd":15.0,"su":8,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=You%26I%20Premium%20Suki%20Buffet%20March%C3%A9%20Thonglor%202nd%20Floor&query_place_id=ChIJxXLrTF2f4jARQ5rNYsm0jvc","lat":13.7284538,"lng":100.5814707},{"rank":5,"name":"BABA (बाबा) @Marché Thonglor","cat":"Other","tags":"Buffet","rating":4.8,"reviews":334,"price":800,"price_src":"scraped","dist":462,"total":91.0,"sr":22.0,"sg":20,"sp":15,"st":11,"sd":15.0,"su":8,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=BABA%20(%E0%A4%AC%E0%A4%BE%E0%A4%AC%E0%A4%BE)%20%40March%C3%A9%20Thonglor&query_place_id=ChIJifNLs1Of4jAR3H6h56ZMF-E","lat":13.728343,"lng":100.5810975},{"rank":6,"name":"FUWANG HOT POT • TEA HOUSE 富王火锅 茶馆","cat":"Chinese","tags":"Hotpot/Shabu","rating":4.8,"reviews":589,"price":1000,"price_src":"scraped","dist":483,"total":89.6,"sr":22.8,"sg":20,"sp":12.8,"st":11,"sd":15.0,"su":8,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=FUWANG%20HOT%20POT%20%E2%80%A2%20TEA%20HOUSE%20%E5%AF%8C%E7%8E%8B%E7%81%AB%E9%94%85%20%E8%8C%B6%E9%A6%86&query_place_id=ChIJh4-50VOf4jARSY4VbZwsTrA","lat":13.728512,"lng":100.5813645},{"rank":7,"name":"9Nine Korean Restaurant","cat":"Korean","tags":"","rating":4.9,"reviews":1046,"price":1100,"price_src":"scraped","dist":472,"total":89.4,"sr":23.8,"sg":20,"sp":11.6,"st":11,"sd":15.0,"su":8,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=9Nine%20Korean%20Restaurant&query_place_id=ChIJs2v_ZfCf4jAR345T39kaqeI","lat":13.7283967,"lng":100.581468},{"rank":8,"name":"Krua Jiang Mai","cat":"Thai","tags":"","rating":4.8,"reviews":2714,"price":300,"price_src":"scraped","dist":668,"total":89.4,"sr":24.4,"sg":20,"sp":15,"st":7,"sd":15.0,"su":8,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Krua%20Jiang%20Mai&query_place_id=ChIJh7s6GVOe4jAReTmapQOwBQ0","lat":13.7301922,"lng":100.5811893},{"rank":9,"name":"AUDREY CAFE & BISTRO","cat":"Other","tags":"Buffet","rating":4.2,"reviews":1177,"price":800,"price_src":"scraped","dist":974,"total":88.9,"sr":21.9,"sg":20,"sp":15,"st":7,"sd":15.0,"su":10,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=AUDREY%20CAFE%20%26%20BISTRO&query_place_id=ChIJx9vXV1Oe4jARxblHEzTi5Pk","lat":13.7329413,"lng":100.5802337},{"rank":10,"name":"TUBA Bar & Restaurant","cat":"Thai","tags":"Buffet","rating":4.8,"reviews":3924,"price":600,"price_src":"scraped","dist":1786,"total":88.4,"sr":24.4,"sg":20,"sp":15,"st":4,"sd":15.0,"su":10,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=TUBA%20Bar%20%26%20Restaurant&query_place_id=ChIJJyqGlK-f4jARNBb_DKd3nV4","lat":13.7384166,"lng":100.5884871},{"rank":11,"name":"Din Tai Fung Eight Thonglor","cat":"Chinese","tags":"","rating":4.6,"reviews":1246,"price":800,"price_src":"scraped","dist":724,"total":88.2,"sr":23.2,"sg":20,"sp":15,"st":7,"sd":15.0,"su":8,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Din%20Tai%20Fung%20Eight%20Thonglor&query_place_id=ChIJDQOt7Kyf4jARhDHoiXUbI9k","lat":13.7306474,"lng":100.5817156},{"rank":12,"name":"Suki Masa","cat":"Japanese","tags":"Buffet; Hotpot/Shabu","rating":4.5,"reviews":559,"price":1100,"price_src":"scraped","dist":510,"total":87.4,"sr":21.8,"sg":20,"sp":11.6,"st":11,"sd":15.0,"su":8,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Suki%20Masa&query_place_id=ChIJB3JBiauf4jARcvqAEmwGkIM","lat":13.7286805,"lng":100.5798099},{"rank":13,"name":"Grand Shanghai","cat":"Chinese","tags":"","rating":4.3,"reviews":281,"price":700,"price_src":"scraped","dist":579,"total":87.3,"sr":20.3,"sg":20,"sp":15,"st":11,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Grand%20Shanghai&query_place_id=ChIJwX3HY6yf4jARtRD8yE8CafY","lat":13.7293885,"lng":100.5812507},{"rank":14,"name":"Hiroshima Pizza Okonomiyaki","cat":"Japanese","tags":"Hotpot/Shabu","rating":4.5,"reviews":1066,"price":300,"price_src":"scraped","dist":1438,"total":86.7,"sr":22.7,"sg":20,"sp":15,"st":4,"sd":15.0,"su":10,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Hiroshima%20Pizza%20Okonomiyaki&query_place_id=ChIJQ3awN1Se4jAR-k-B5aBKCes","lat":13.7369239,"lng":100.5784074},{"rank":15,"name":"Lucca Thonglor – Mediterranean Restaurant, Rooftop & All-Day Brunch","cat":"Thai","tags":"","rating":4.9,"reviews":839,"price":400,"price_src":"scraped","dist":683,"total":86.6,"sr":23.6,"sg":20,"sp":15,"st":7,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Lucca%20Thonglor%20%E2%80%93%20Mediterranean%20Restaurant%2C%20Rooftop%20%26%20All-Day%20Brunch&query_place_id=ChIJbx8TnXKf4jARvOgGrfi8gCQ","lat":13.7303348,"lng":100.5811362},{"rank":16,"name":"SURAK (ซูรัก) บุฟเฟต์ปูดองเกาหลีต้นตำรับที่แรกในไทย l 수락 한식당 에까마이 l エカマイの韓国料理店 l SURAK korean restaurant Ekkamai","cat":"Korean","tags":"Buffet","rating":4.8,"reviews":1132,"price":900,"price_src":"scraped","dist":1063,"total":86.6,"sr":23.7,"sg":20,"sp":13.9,"st":4,"sd":15.0,"su":10,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=SURAK%20(%E0%B8%8B%E0%B8%B9%E0%B8%A3%E0%B8%B1%E0%B8%81)%20%E0%B8%9A%E0%B8%B8%E0%B8%9F%E0%B9%80%E0%B8%9F%E0%B8%95%E0%B9%8C%E0%B8%9B%E0%B8%B9%E0%B8%94%E0%B8%AD%E0%B8%87%E0%B9%80%E0%B8%81%E0%B8%B2%E0%B8%AB%E0%B8%A5%E0%B8%B5%E0%B8%95%E0%B9%89%E0%B8%99%E0%B8%95%E0%B8%B3%E0%B8%A3%E0%B8%B1%E0%B8%9A%E0%B8%97%E0%B8%B5%E0%B9%88%E0%B9%81%E0%B8%A3%E0%B8%81%E0%B9%83%E0%B8%99%E0%B9%84%E0%B8%97%E0%B8%A2%20l%20%EC%88%98%EB%9D%BD%20%ED%95%9C%EC%8B%9D%EB%8B%B9%20%EC%97%90%EA%B9%8C%EB%A7%88%EC%9D%B4%20l%20%E3%82%A8%E3%82%AB%E3%83%9E%E3%82%A4%E3%81%AE%E9%9F%93%E5%9B%BD%E6%96%99%E7%90%86%E5%BA%97%20l%20SURAK%20korean%20restaurant%20Ekkamai&query_place_id=ChIJiT2icQCf4jAR_jS4pyWfgUs","lat":13.7315149,"lng":100.5871379},{"rank":17,"name":"Yakiniku Maeda","cat":"Japanese","tags":"Buffet; Yakiniku/BBQ","rating":4.9,"reviews":866,"price":1000,"price_src":"scraped","dist":900,"total":86.4,"sr":23.6,"sg":20,"sp":12.8,"st":7,"sd":15.0,"su":8,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Yakiniku%20Maeda&query_place_id=ChIJ0wVCuiWf4jAREmPzwT-sTLs","lat":13.7307491,"lng":100.5856994},{"rank":18,"name":"Jirakaan Restaurant (จิรกาล)","cat":"Thai","tags":"","rating":4.8,"reviews":1002,"price":1000,"price_src":"scraped","dist":770,"total":86.3,"sr":23.5,"sg":20,"sp":12.8,"st":7,"sd":15.0,"su":8,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Jirakaan%20Restaurant%20(%E0%B8%88%E0%B8%B4%E0%B8%A3%E0%B8%81%E0%B8%B2%E0%B8%A5)&query_place_id=ChIJd1SaQ7Sf4jARoFvSOzrxAn4","lat":13.7302437,"lng":100.5773211},{"rank":19,"name":"Tutto Matto - Thong Lo 10 (FKA: Panini Mafia)","cat":"Italian","tags":"","rating":4.8,"reviews":687,"price":300,"price_src":"scraped","dist":870,"total":86.0,"sr":23.0,"sg":20,"sp":15,"st":7,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Tutto%20Matto%20-%20Thong%20Lo%2010%20(FKA%3A%20Panini%20Mafia)&query_place_id=ChIJX1uPp8ye4jAR8PK6eeVuYDw","lat":13.7308116,"lng":100.5851039},{"rank":20,"name":"Beast & Butter : Burgers & Beers (Thong Lo)","cat":"Korean","tags":"","rating":4.6,"reviews":943,"price":500,"price_src":"scraped","dist":905,"total":85.8,"sr":22.8,"sg":20,"sp":15,"st":7,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Beast%20%26%20Butter%20%3A%20Burgers%20%26%20Beers%20(Thong%20Lo)&query_place_id=ChIJFftycf2f4jARwnxIgkl4Kn4","lat":13.7320906,"lng":100.5828512},{"rank":21,"name":"Supanniga Eating Room by Khun Yai","cat":"Thai","tags":"","rating":4.4,"reviews":1723,"price":1000,"price_src":"scraped","dist":674,"total":85.8,"sr":23.0,"sg":20,"sp":12.8,"st":7,"sd":15.0,"su":8,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Supanniga%20Eating%20Room%20by%20Khun%20Yai&query_place_id=ChIJYSgxk6yf4jAROxN8pCQzqJA","lat":13.7302219,"lng":100.5815348},{"rank":22,"name":"คนละหม้อ Konlamoh","cat":"Chinese","tags":"","rating":4.8,"reviews":573,"price":800,"price_src":"scraped","dist":770,"total":85.8,"sr":22.8,"sg":20,"sp":15,"st":7,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=%E0%B8%84%E0%B8%99%E0%B8%A5%E0%B8%B0%E0%B8%AB%E0%B8%A1%E0%B9%89%E0%B8%AD%20Konlamoh&query_place_id=ChIJ45ZOFhif4jARvzx8AMBgj-c","lat":13.7310996,"lng":100.5814526},{"rank":23,"name":"BlueSpice Grande Centre Point Sukhumvit55","cat":"Other","tags":"Buffet","rating":4.6,"reviews":185,"price":500,"price_src":"scraped","dist":863,"total":85.7,"sr":20.7,"sg":20,"sp":15,"st":7,"sd":15.0,"su":8,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=BlueSpice%20Grande%20Centre%20Point%20Sukhumvit55&query_place_id=ChIJSZWUwU6f4jAREjsIUl7UcDA","lat":13.7317808,"lng":100.5824975},{"rank":24,"name":"CQK Hotpot Ekkamai-Thonglor Branch (磁器口火锅通罗店）","cat":"Chinese","tags":"Hotpot/Shabu","rating":4.9,"reviews":4231,"price":900,"price_src":"scraped","dist":1104,"total":85.6,"sr":24.7,"sg":20,"sp":13.9,"st":4,"sd":15.0,"su":8,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=CQK%20Hotpot%20Ekkamai-Thonglor%20Branch%20(%E7%A3%81%E5%99%A8%E5%8F%A3%E7%81%AB%E9%94%85%E9%80%9A%E7%BD%97%E5%BA%97%EF%BC%89&query_place_id=ChIJsYzmbumf4jARPRZjVrsY5w8","lat":13.7322265,"lng":100.5868186},{"rank":25,"name":"ROAST coffee & eatery","cat":"Italian","tags":"","rating":4.5,"reviews":2800,"price":600,"price_src":"scraped","dist":1217,"total":85.5,"sr":23.5,"sg":20,"sp":15,"st":4,"sd":15.0,"su":8,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=ROAST%20coffee%20%26%20eatery&query_place_id=ChIJicwRRFOe4jARAcJ7qJDLIe8","lat":13.7350544,"lng":100.5822684},{"rank":26,"name":"Earth House | Restaurant | Wine Bar","cat":"Korean","tags":"","rating":4.8,"reviews":413,"price":800,"price_src":"scraped","dist":745,"total":85.3,"sr":22.3,"sg":20,"sp":15,"st":7,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Earth%20House%20%7C%20Restaurant%20%7C%20Wine%20Bar&query_place_id=ChIJv5-PuJuf4jAR_l918T7WfeY","lat":13.7304881,"lng":100.5784073},{"rank":27,"name":"LOONG MALA HOTPOT DONKI MALL THONGLOR","cat":"Chinese","tags":"Hotpot/Shabu","rating":4.7,"reviews":1098,"price":1250,"price_src":"scraped","dist":915,"total":85.2,"sr":23.3,"sg":20,"sp":9.9,"st":7,"sd":15.0,"su":10,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=LOONG%20MALA%20HOTPOT%20DONKI%20MALL%20THONGLOR&query_place_id=ChIJpUiMxc2f4jARWC4_KxZFD4g","lat":13.730875,"lng":100.5857467},{"rank":28,"name":"Nagiya Thonglo 9 なぎ屋トンロー9店 นากิยะ ทองหล่อ 9","cat":"Japanese","tags":"","rating":4.5,"reviews":499,"price":800,"price_src":"scraped","dist":869,"total":84.7,"sr":21.7,"sg":20,"sp":15,"st":7,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Nagiya%20Thonglo%209%20%E3%81%AA%E3%81%8E%E5%B1%8B%E3%83%88%E3%83%B3%E3%83%AD%E3%83%BC9%E5%BA%97%20%E0%B8%99%E0%B8%B2%E0%B8%81%E0%B8%B4%E0%B8%A2%E0%B8%B0%20%E0%B8%97%E0%B8%AD%E0%B8%87%E0%B8%AB%E0%B8%A5%E0%B9%88%E0%B8%AD%209&query_place_id=ChIJv74RolSe4jARW9tYgGewOdU","lat":13.7319693,"lng":100.581656},{"rank":29,"name":"Boon Tong Kee Sukhumvit 49","cat":"Chinese","tags":"","rating":4.4,"reviews":573,"price":300,"price_src":"scraped","dist":988,"total":84.6,"sr":21.6,"sg":20,"sp":15,"st":7,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"No","url":"https://www.google.com/maps/search/?api=1&query=Boon%20Tong%20Kee%20Sukhumvit%2049&query_place_id=ChIJizueyKqf4jARaI2W0GY6a3Y","lat":13.7319558,"lng":100.5763324},{"rank":30,"name":"Vegano Bangkok - Thonglo 10","cat":"Italian","tags":"","rating":4.7,"reviews":251,"price":300,"price_src":"scraped","dist":873,"total":84.4,"sr":21.4,"sg":20,"sp":15,"st":7,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Vegano%20Bangkok%20-%20Thonglo%2010&query_place_id=ChIJO_LwyJ-f4jARdNzFmrELAgk","lat":13.7308585,"lng":100.5850851},{"rank":31,"name":"Mitoki japanese restaurant","cat":"Japanese","tags":"Buffet","rating":4.3,"reviews":107,"price":350,"price_src":"scraped","dist":921,"total":84.1,"sr":19.1,"sg":20,"sp":15,"st":7,"sd":15.0,"su":8,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Mitoki%20japanese%20restaurant&query_place_id=ChIJF3jqQt6f4jAREtKDCAUxnUw","lat":13.7308904,"lng":100.585822},{"rank":32,"name":"อีหล่า อีสานกายะ ทองหล่อ (Era-izaan Kaya Thonglor)","cat":"Japanese","tags":"","rating":4.7,"reviews":852,"price":700,"price_src":"scraped","dist":956,"total":84.0,"sr":23.0,"sg":20,"sp":15,"st":7,"sd":15.0,"su":4,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=%E0%B8%AD%E0%B8%B5%E0%B8%AB%E0%B8%A5%E0%B9%88%E0%B8%B2%20%E0%B8%AD%E0%B8%B5%E0%B8%AA%E0%B8%B2%E0%B8%99%E0%B8%81%E0%B8%B2%E0%B8%A2%E0%B8%B0%20%E0%B8%97%E0%B8%AD%E0%B8%87%E0%B8%AB%E0%B8%A5%E0%B9%88%E0%B8%AD%20(Era-izaan%20Kaya%20Thonglor)&query_place_id=ChIJd5ObZC-f4jARnQKOFsQbVHM","lat":13.7311593,"lng":100.5859912},{"rank":33,"name":"GRILL IN BANGKOK","cat":"Korean","tags":"","rating":4.7,"reviews":173,"price":600,"price_src":"scraped","dist":916,"total":83.9,"sr":20.9,"sg":20,"sp":15,"st":7,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=GRILL%20IN%20BANGKOK&query_place_id=ChIJ90VwuQqf4jARgGj48NSM03U","lat":13.7306933,"lng":100.5860124},{"rank":34,"name":"MAGURO @Marché Thonglor | Japanese Dining and Bar","cat":"Japanese","tags":"","rating":4.6,"reviews":486,"price":1250,"price_src":"scraped","dist":510,"total":83.8,"sr":21.9,"sg":20,"sp":9.9,"st":11,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=MAGURO%20%40March%C3%A9%20Thonglor%20%7C%20Japanese%20Dining%20and%20Bar&query_place_id=ChIJbVBkkCqf4jARaS_Q0DpBRDs","lat":13.7287445,"lng":100.5814048},{"rank":35,"name":"Terra Thonglor","cat":"Japanese","tags":"Hotpot/Shabu","rating":4.8,"reviews":1100,"price":1400,"price_src":"scraped","dist":888,"total":83.8,"sr":23.6,"sg":20,"sp":8.2,"st":7,"sd":15.0,"su":10,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Terra%20Thonglor&query_place_id=ChIJD-BXBI6f4jARI65_08-WeVQ","lat":13.7309722,"lng":100.5851555},{"rank":36,"name":"L'ecrin 55","cat":"Japanese","tags":"","rating":4.5,"reviews":200,"price":700,"price_src":"scraped","dist":818,"total":83.5,"sr":20.5,"sg":20,"sp":15,"st":7,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=L'ecrin%2055&query_place_id=ChIJFSI8YLaf4jARLdZFhcjVTtk","lat":13.7315135,"lng":100.5816099},{"rank":37,"name":"Japanese Kitchen Ant'z – Izakaya (Japanese-style Pub)","cat":"Japanese","tags":"","rating":4.8,"reviews":925,"price":800,"price_src":"scraped","dist":1051,"total":83.4,"sr":23.4,"sg":20,"sp":15,"st":4,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Japanese%20Kitchen%20Ant'z%20%E2%80%93%20Izakaya%20(Japanese-style%20Pub)&query_place_id=ChIJg3ajJE2f4jARtZZWpdWH-uw","lat":13.7334298,"lng":100.5828804},{"rank":38,"name":"MoonLight Korean chicken & beer","cat":"Korean","tags":"","rating":4.6,"reviews":155,"price":600,"price_src":"scraped","dist":911,"total":83.4,"sr":20.4,"sg":20,"sp":15,"st":7,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=MoonLight%20Korean%20chicken%20%26%20beer&query_place_id=ChIJyy6lXTqf4jARjR6FSztL9nY","lat":13.7304765,"lng":100.5862269},{"rank":39,"name":"Masala Art","cat":"Korean","tags":"","rating":4.5,"reviews":847,"price":1000,"price_src":"scraped","dist":726,"total":83.2,"sr":22.4,"sg":20,"sp":12.8,"st":7,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Masala%20Art&query_place_id=ChIJk3gt66yf4jAR6zhwS8H_Av0","lat":13.7306581,"lng":100.5817829},{"rank":40,"name":"Ekamai Mookata","cat":"Thai","tags":"Buffet; Yakiniku/BBQ","rating":4.6,"reviews":260,"price":500,"price_src":"scraped","dist":1579,"total":83.1,"sr":21.1,"sg":20,"sp":15,"st":4,"sd":15.0,"su":8,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Ekamai%20Mookata&query_place_id=ChIJ7_g6IWCf4jARCB15EZJY77A","lat":13.7357654,"lng":100.5892865},{"rank":41,"name":"IKKYU Yakinikudokoro","cat":"Japanese","tags":"Yakiniku/BBQ","rating":4.7,"reviews":445,"price":900,"price_src":"scraped","dist":1092,"total":83.0,"sr":22.1,"sg":20,"sp":13.9,"st":4,"sd":15.0,"su":8,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=IKKYU%20Yakinikudokoro&query_place_id=ChIJKXe8olSe4jARyrGWFNJD6Tk","lat":13.7339619,"lng":100.5796592},{"rank":42,"name":"Kingkong Yakiniku Buffet","cat":"Japanese","tags":"Buffet; Yakiniku/BBQ","rating":4,"reviews":950,"price":700,"price_src":"scraped","dist":1762,"total":83.0,"sr":21.0,"sg":20,"sp":15,"st":4,"sd":15.0,"su":8,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Kingkong%20Yakiniku%20Buffet&query_place_id=ChIJG0gGj06e4jARxN01n4pGah8","lat":13.7379358,"lng":100.5889314},{"rank":43,"name":"Arno's Thonglor","cat":"Steakhouse","tags":"","rating":4.2,"reviews":1069,"price":900,"price_src":"scraped","dist":1049,"total":82.7,"sr":21.8,"sg":20,"sp":13.9,"st":4,"sd":15.0,"su":8,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Arno's%20Thonglor&query_place_id=ChIJr6yeByWf4jARWZBjp3I2Pz4","lat":13.7336267,"lng":100.5811932},{"rank":44,"name":"Sushi Hiro (Eight Thonglor)","cat":"Japanese","tags":"","rating":4.5,"reviews":109,"price":800,"price_src":"scraped","dist":734,"total":82.7,"sr":19.7,"sg":20,"sp":15,"st":7,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Sushi%20Hiro%20(Eight%20Thonglor)&query_place_id=ChIJi4gaOtGf4jAR-yThrOOv-sA","lat":13.7306925,"lng":100.582015},{"rank":45,"name":"Yuki wagyu shabu izakaya. Premium shabu sushi handroll.","cat":"Japanese","tags":"Hotpot/Shabu","rating":4.9,"reviews":96,"price":600,"price_src":"scraped","dist":1488,"total":82.7,"sr":20.7,"sg":20,"sp":15,"st":4,"sd":15.0,"su":8,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Yuki%20wagyu%20shabu%20izakaya.%20Premium%20shabu%20sushi%20handroll.&query_place_id=ChIJIULkYgCf4jARLy9unQJgbtY","lat":13.7356625,"lng":100.5879028},{"rank":46,"name":"Breakfast Story Thonglor","cat":"Other","tags":"Buffet","rating":4.7,"reviews":582,"price":300,"price_src":"scraped","dist":581,"total":82.5,"sr":22.5,"sg":12,"sp":15,"st":11,"sd":15.0,"su":7,"groups":"Yes","reserve":"No","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Breakfast%20Story%20Thonglor&query_place_id=ChIJa5vc1pSf4jARnkGCYRYBpE8","lat":13.7294073,"lng":100.5812542},{"rank":47,"name":"Tai-He-Xuan","cat":"Chinese","tags":"Buffet","rating":4,"reviews":624,"price":700,"price_src":"scraped","dist":1760,"total":82.5,"sr":20.5,"sg":20,"sp":15,"st":4,"sd":15.0,"su":8,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Tai-He-Xuan&query_place_id=ChIJq42u2FGe4jARiEtRxqcl6O4","lat":13.739332,"lng":100.5855729},{"rank":48,"name":"Gopchang House Thonglor","cat":"Korean","tags":"Buffet","rating":4.4,"reviews":231,"price":700,"price_src":"scraped","dist":1241,"total":82.4,"sr":20.4,"sg":20,"sp":15,"st":4,"sd":15.0,"su":8,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Gopchang%20House%20Thonglor&query_place_id=ChIJAZ1hqT2f4jARsu5r4_zaplM","lat":13.7351785,"lng":100.5828763},{"rank":49,"name":"Minamoto Shabu","cat":"Japanese","tags":"Hotpot/Shabu","rating":4.8,"reviews":133,"price":1100,"price_src":"scraped","dist":666,"total":82.4,"sr":20.8,"sg":20,"sp":11.6,"st":7,"sd":15.0,"su":8,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Minamoto%20Shabu&query_place_id=ChIJGenDAgCf4jAR3isKVtjqFfs","lat":13.7301415,"lng":100.5816046},{"rank":50,"name":"Thong Lo Yokocho","cat":"Japanese","tags":"","rating":4.6,"reviews":705,"price":600,"price_src":"scraped","dist":1015,"total":82.4,"sr":22.4,"sg":20,"sp":15,"st":4,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Thong%20Lo%20Yokocho&query_place_id=ChIJCxd7WFKe4jARBpavYzUGhlo","lat":13.7333042,"lng":100.5801451},{"rank":51,"name":"Yuzu Suki ゆずすき - Thong Lo","cat":"Japanese","tags":"Hotpot/Shabu","rating":4.8,"reviews":218,"price":900,"price_src":"scraped","dist":1146,"total":82.4,"sr":21.5,"sg":20,"sp":13.9,"st":4,"sd":15.0,"su":8,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Yuzu%20Suki%20%E3%82%86%E3%81%9A%E3%81%99%E3%81%8D%20-%20Thong%20Lo&query_place_id=ChIJHyM-VbKf4jARqkYy-NJsrTw","lat":13.734504,"lng":100.5804855},{"rank":52,"name":"DDC PIZZA ( Délices de Capoue )","cat":"Italian","tags":"","rating":4.7,"reviews":481,"price":700,"price_src":"scraped","dist":1555,"total":82.2,"sr":22.2,"sg":20,"sp":15,"st":4,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=DDC%20PIZZA%20(%20D%C3%A9lices%20de%20Capoue%20)&query_place_id=ChIJ95N6uE2e4jARK7OM6zQB5LI","lat":13.7364449,"lng":100.5877511},{"rank":53,"name":"Ñam Ñam Pasta and Tapas (RQ49 Mall)","cat":"Italian","tags":"","rating":4.5,"reviews":731,"price":500,"price_src":"scraped","dist":1340,"total":82.2,"sr":22.2,"sg":20,"sp":15,"st":4,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=%C3%91am%20%C3%91am%20Pasta%20and%20Tapas%20(RQ49%20Mall)&query_place_id=ChIJkz160DSf4jARswZWter9CMc","lat":13.735674,"lng":100.5769932},{"rank":54,"name":"Japanese Ramen Izakaya ICHIKARA Thonglor / Ramen Restaurant","cat":"Japanese","tags":"","rating":4.2,"reviews":135,"price":300,"price_src":"scraped","dist":637,"total":82.1,"sr":19.1,"sg":20,"sp":15,"st":7,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Japanese%20Ramen%20Izakaya%20ICHIKARA%20Thonglor%20%2F%20Ramen%20Restaurant&query_place_id=ChIJxWY3Lcif4jARQelX3LVlqm4","lat":13.729918,"lng":100.581098},{"rank":55,"name":"Palm Cuisine","cat":"Thai","tags":"Hotpot/Shabu","rating":4.4,"reviews":194,"price":500,"price_src":"scraped","dist":1140,"total":82.1,"sr":20.1,"sg":20,"sp":15,"st":4,"sd":15.0,"su":8,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Palm%20Cuisine&query_place_id=ChIJp-WF4VKe4jARCQLHtcMFRrE","lat":13.7341738,"lng":100.5832361},{"rank":56,"name":"Hazy Hound : Craft Beers & Bites","cat":"Italian","tags":"","rating":4.9,"reviews":221,"price":300,"price_src":"scraped","dist":896,"total":81.8,"sr":21.8,"sg":20,"sp":15,"st":7,"sd":15.0,"su":3,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Hazy%20Hound%20%3A%20Craft%20Beers%20%26%20Bites&query_place_id=ChIJD5IJqz-f4jARg-Fuc_mP5O0","lat":13.7319978,"lng":100.5828835},{"rank":57,"name":"Stoke Bangkok","cat":"Steakhouse","tags":"","rating":4.9,"reviews":295,"price":1100,"price_src":"scraped","dist":660,"total":81.8,"sr":22.2,"sg":20,"sp":11.6,"st":7,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Stoke%20Bangkok&query_place_id=ChIJK_UAaAOf4jARxyBbm3MPyns","lat":13.730093,"lng":100.5815496},{"rank":58,"name":"TAKAKI","cat":"Japanese","tags":"Buffet","rating":4.2,"reviews":242,"price":300,"price_src":"scraped","dist":1711,"total":81.8,"sr":19.8,"sg":20,"sp":15,"st":4,"sd":15.0,"su":8,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=TAKAKI&query_place_id=ChIJfVRN61Ge4jARJnIdgI51_UI","lat":13.7391666,"lng":100.5844722},{"rank":59,"name":"MADDINING","cat":"Italian","tags":"","rating":4.9,"reviews":47,"price":900,"price_src":"scraped","dist":996,"total":81.7,"sr":19.8,"sg":20,"sp":13.9,"st":7,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=MADDINING&query_place_id=ChIJnZcas0Of4jAROez5fE4GZ1o","lat":13.7322128,"lng":100.5766847},{"rank":60,"name":"Mellow Thong Lo","cat":"Thai","tags":"","rating":4.4,"reviews":589,"price":600,"price_src":"scraped","dist":1175,"total":81.6,"sr":21.6,"sg":20,"sp":15,"st":4,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Mellow%20Thong%20Lo&query_place_id=ChIJkxPaAlOe4jARSq4RQholm-I","lat":13.7345552,"lng":100.582946},{"rank":61,"name":"Nojiya Yuushi","cat":"Japanese","tags":"","rating":4.3,"reviews":666,"price":300,"price_src":"scraped","dist":1287,"total":81.5,"sr":21.5,"sg":20,"sp":15,"st":4,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Nojiya%20Yuushi&query_place_id=ChIJTfk8YFKe4jARFHSSruSKJwA","lat":13.7351979,"lng":100.5845169},{"rank":62,"name":"SUNLIT HOTPOT 叁两老火锅","cat":"Chinese","tags":"Hotpot/Shabu","rating":4.9,"reviews":79,"price":900,"price_src":"scraped","dist":971,"total":81.3,"sr":20.5,"sg":20,"sp":13.9,"st":7,"sd":12.9,"su":7,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=SUNLIT%20HOTPOT%20%E5%8F%81%E4%B8%A4%E8%80%81%E7%81%AB%E9%94%85&query_place_id=ChIJs3R9da6f4jARCDLMnp9Y7Gk","lat":13.730357,"lng":100.587177},{"rank":63,"name":"Khao Jao","cat":"Thai","tags":"","rating":4.2,"reviews":648,"price":300,"price_src":"scraped","dist":1244,"total":81.1,"sr":21.1,"sg":20,"sp":15,"st":4,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"No","url":"https://www.google.com/maps/search/?api=1&query=Khao%20Jao&query_place_id=ChIJ-w3sn1Oe4jAR79t8CO-3o_Y","lat":13.735349,"lng":100.581705},{"rank":64,"name":"Mandarin Roast Duck","cat":"Chinese","tags":"","rating":4.4,"reviews":377,"price":500,"price_src":"scraped","dist":1891,"total":81.0,"sr":21.0,"sg":20,"sp":15,"st":4,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Mandarin%20Roast%20Duck&query_place_id=ChIJw-rVT1Ke4jAR8vyAhe_0c00","lat":13.7407593,"lng":100.5847708},{"rank":65,"name":"Omi Beef OKAKI - since 1839","cat":"Japanese","tags":"Yakiniku/BBQ","rating":4.5,"reviews":322,"price":1250,"price_src":"scraped","dist":867,"total":81.0,"sr":21.1,"sg":20,"sp":9.9,"st":7,"sd":15.0,"su":8,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Omi%20Beef%20OKAKI%20-%20since%201839&query_place_id=ChIJ5yat6r6f4jARxWc7ZD3vYok","lat":13.7316066,"lng":100.5783056},{"rank":66,"name":"Kizuna shabu & hand roll","cat":"Japanese","tags":"Hotpot/Shabu","rating":4.8,"reviews":353,"price":900,"price_src":"scraped","dist":1534,"total":80.9,"sr":22.1,"sg":20,"sp":13.9,"st":4,"sd":12.9,"su":8,"groups":"Yes","reserve":"Yes","closes_late":null,"url":"https://www.google.com/maps/search/?api=1&query=Kizuna%20shabu%20%26%20hand%20roll&query_place_id=ChIJ20vYIamf4jAR8E6vjbUwnpo","lat":13.7360397,"lng":100.588085},{"rank":67,"name":"ARROZ - Bangkok - Spanish Restaurant - Paella - Tapas","cat":"Korean","tags":"","rating":4.3,"reviews":514,"price":1100,"price_src":"scraped","dist":729,"total":80.7,"sr":21.1,"sg":20,"sp":11.6,"st":7,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=ARROZ%20-%20Bangkok%20-%20Spanish%20Restaurant%20-%20Paella%20-%20Tapas&query_place_id=ChIJmyqfD6uf4jARgQdiYdaMz80","lat":13.7302761,"lng":100.5782665},{"rank":68,"name":"Azuma Soba Restaurant","cat":"Japanese","tags":"Hotpot/Shabu","rating":4.4,"reviews":518,"price":1050,"price_src":"estimated (category median)","dist":1507,"total":80.6,"sr":21.4,"sg":20,"sp":12.2,"st":4,"sd":15.0,"su":8,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Azuma%20Soba%20Restaurant&query_place_id=ChIJtZSEyVWe4jARR8V9g8gUt-I","lat":13.7372558,"lng":100.5770425},{"rank":69,"name":"Heisei Kushi Izakaya","cat":"Japanese","tags":"","rating":4.9,"reviews":379,"price":700,"price_src":"scraped","dist":1109,"total":80.5,"sr":22.5,"sg":20,"sp":15,"st":4,"sd":15.0,"su":4,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Heisei%20Kushi%20Izakaya&query_place_id=ChIJze3TD4mf4jARpJcZ28HqRZ8","lat":13.734134,"lng":100.579841},{"rank":70,"name":"Takara Genka Sakaba","cat":"Japanese","tags":"Buffet","rating":4.1,"reviews":593,"price":1000,"price_src":"scraped","dist":1020,"total":80.5,"sr":20.7,"sg":20,"sp":12.8,"st":4,"sd":15.0,"su":8,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Takara%20Genka%20Sakaba&query_place_id=ChIJq-Vx7VSf4jAR-43-fpsAn7Y","lat":13.7332362,"lng":100.582451},{"rank":71,"name":"Serica Antipasti & Wine Bar","cat":"Italian","tags":"","rating":5,"reviews":60,"price":700,"price_src":"scraped","dist":1689,"total":80.4,"sr":20.4,"sg":20,"sp":15,"st":4,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Serica%20Antipasti%20%26%20Wine%20Bar&query_place_id=ChIJ1TnoBwCf4jARlFPWMY0f_cY","lat":13.7393806,"lng":100.5802975},{"rank":72,"name":"Edo Kitchen","cat":"Chinese","tags":"","rating":4.5,"reviews":171,"price":300,"price_src":"scraped","dist":1276,"total":80.3,"sr":20.3,"sg":20,"sp":15,"st":4,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Edo%20Kitchen&query_place_id=ChIJT3RV2tOf4jARKBE-COvykl0","lat":13.7351761,"lng":100.5773619},{"rank":73,"name":"Yakiniku Oniku to Gohan Thong Lo","cat":"Japanese","tags":"Buffet; Yakiniku/BBQ","rating":4.7,"reviews":414,"price":1050,"price_src":"estimated (category median)","dist":658,"total":80.1,"sr":22.0,"sg":20,"sp":12.2,"st":7,"sd":12.9,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Yakiniku%20Oniku%20to%20Gohan%20Thong%20Lo&query_place_id=ChIJIfUiH3if4jARux9ZMdRePtw","lat":13.7299297,"lng":100.5792773},{"rank":74,"name":"Met Cafe Bangkok","cat":"Thai","tags":"","rating":4.3,"reviews":228,"price":600,"price_src":"scraped","dist":1688,"total":80.0,"sr":20.0,"sg":20,"sp":15,"st":4,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Met%20Cafe%20Bangkok&query_place_id=ChIJg-o9k1Ge4jAR8FQvgSCS6fY","lat":13.7389645,"lng":100.5844441},{"rank":75,"name":"88 Isankaya","cat":"Thai","tags":"","rating":4.9,"reviews":96,"price":250,"price_src":"scraped","dist":1514,"total":79.4,"sr":20.7,"sg":20,"sp":13.7,"st":4,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"No","url":"https://www.google.com/maps/search/?api=1&query=88%20Isankaya&query_place_id=ChIJuanS42Of4jARXcQCRcwBCVE","lat":13.7364286,"lng":100.5869607},{"rank":76,"name":"Another Round","cat":"Thai","tags":"","rating":4.8,"reviews":430,"price":800,"price_src":"scraped","dist":1077,"total":79.4,"sr":22.4,"sg":20,"sp":15,"st":4,"sd":15.0,"su":3,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Another%20Round&query_place_id=ChIJD75XDlKf4jARvAglbw_g6UU","lat":13.7338509,"lng":100.5799625},{"rank":77,"name":"Pasta 54","cat":"Italian","tags":"","rating":4.4,"reviews":103,"price":300,"price_src":"scraped","dist":1785,"total":79.3,"sr":19.3,"sg":20,"sp":15,"st":4,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Pasta%2054&query_place_id=ChIJBTTVJFGe4jARsl1WNDsHCB8","lat":13.7402459,"lng":100.5812059},{"rank":78,"name":"SHAKARICH","cat":"Japanese","tags":"Hotpot/Shabu","rating":4.7,"reviews":530,"price":1250,"price_src":"scraped","dist":1054,"total":79.3,"sr":22.4,"sg":20,"sp":9.9,"st":4,"sd":15.0,"su":8,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=SHAKARICH&query_place_id=ChIJWY30I1Oe4jARlP_8fcdYYhw","lat":13.7334515,"lng":100.5829178},{"rank":79,"name":"Omakasedon by Teppen Donki Mall","cat":"Japanese","tags":"","rating":4.9,"reviews":543,"price":1050,"price_src":"estimated (category median)","dist":910,"total":79.1,"sr":23.0,"sg":20,"sp":12.2,"st":7,"sd":12.9,"su":4,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Omakasedon%20by%20Teppen%20Donki%20Mall&query_place_id=ChIJvcdSHCmf4jARD4tad9JPydA","lat":13.7309963,"lng":100.5854874},{"rank":80,"name":"Sushi Yorokobu","cat":"Japanese","tags":"Buffet","rating":4.8,"reviews":1613,"price":2500,"price_src":"scraped","dist":927,"total":79.1,"sr":24.1,"sg":20,"sp":3,"st":7,"sd":15.0,"su":10,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Sushi%20Yorokobu&query_place_id=ChIJHbwwjiuf4jARYJDSOTcwKQw","lat":13.7323402,"lng":100.5826309},{"rank":81,"name":"TERRA Thonglor 10","cat":"Korean","tags":"","rating":4.8,"reviews":2795,"price":1250,"price_src":"scraped","dist":898,"total":79.0,"sr":24.4,"sg":20,"sp":9.9,"st":7,"sd":10.7,"su":7,"groups":"Yes","reserve":"Yes","closes_late":null,"url":"https://www.google.com/maps/search/?api=1&query=TERRA%20Thonglor%2010&query_place_id=ChIJhUTRyW-f4jARm6DUT05PdY8","lat":13.7320982,"lng":100.5825551},{"rank":82,"name":"Lai Rot","cat":"Thai","tags":"","rating":4.5,"reviews":277,"price":500,"price_src":"estimated (category median)","dist":1282,"total":78.9,"sr":20.9,"sg":20,"sp":15,"st":4,"sd":15.0,"su":4,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Lai%20Rot&query_place_id=ChIJjTCeAVWe4jARtyAoVja_b4w","lat":13.7351987,"lng":100.5772319},{"rank":83,"name":"Starita Bangkok","cat":"Italian","tags":"","rating":4.6,"reviews":649,"price":1100,"price_src":"scraped","dist":1169,"total":78.9,"sr":22.3,"sg":20,"sp":11.6,"st":4,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Starita%20Bangkok&query_place_id=ChIJWWhOq52f4jAR52sgKXUy4fM","lat":13.7347053,"lng":100.5804978},{"rank":84,"name":"Gen Japanese Charcoal Grill","cat":"Japanese","tags":"Hotpot/Shabu","rating":4.6,"reviews":473,"price":1250,"price_src":"scraped","dist":1306,"total":78.8,"sr":21.9,"sg":20,"sp":9.9,"st":4,"sd":15.0,"su":8,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Gen%20Japanese%20Charcoal%20Grill&query_place_id=ChIJkRyoDU2e4jARsXTtWOVhy3Q","lat":13.7342334,"lng":100.587083},{"rank":85,"name":"Sumi Tei Yakiniku","cat":"Japanese","tags":"Buffet; Yakiniku/BBQ","rating":4.6,"reviews":431,"price":2500,"price_src":"scraped","dist":458,"total":78.8,"sr":21.8,"sg":20,"sp":3,"st":11,"sd":15.0,"su":8,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Sumi%20Tei%20Yakiniku&query_place_id=ChIJcxoFO6uf4jARIkN8Bsq20p0","lat":13.7282762,"lng":100.5813921},{"rank":86,"name":"Ombra Modern Tavern @Seenspace","cat":"Italian","tags":"","rating":4.9,"reviews":241,"price":1000,"price_src":"scraped","dist":1028,"total":78.7,"sr":21.9,"sg":20,"sp":12.8,"st":4,"sd":15.0,"su":5,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Ombra%20Modern%20Tavern%20%40Seenspace&query_place_id=ChIJBesWKrCf4jARCG6Ux9nd1HM","lat":13.7334294,"lng":100.5812768},{"rank":87,"name":"Best Country Beef Steak House Ekkamai เบสท์ เคาร์ตี้ บีฟ เอกมัย สเต็ก เฮ้าล์","cat":"Steakhouse","tags":"","rating":4.7,"reviews":522,"price":1400,"price_src":"scraped","dist":920,"total":78.5,"sr":22.3,"sg":20,"sp":8.2,"st":7,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Best%20Country%20Beef%20Steak%20House%20Ekkamai%20%E0%B9%80%E0%B8%9A%E0%B8%AA%E0%B8%97%E0%B9%8C%20%E0%B9%80%E0%B8%84%E0%B8%B2%E0%B8%A3%E0%B9%8C%E0%B8%95%E0%B8%B5%E0%B9%89%20%E0%B8%9A%E0%B8%B5%E0%B8%9F%20%E0%B9%80%E0%B8%AD%E0%B8%81%E0%B8%A1%E0%B8%B1%E0%B8%A2%20%E0%B8%AA%E0%B9%80%E0%B8%95%E0%B9%87%E0%B8%81%20%E0%B9%80%E0%B8%AE%E0%B9%89%E0%B8%B2%E0%B8%A5%E0%B9%8C&query_place_id=ChIJQYoRbFOf4jARYa9jr-hXBR0","lat":13.7303873,"lng":100.5864483},{"rank":88,"name":"Café Craft by CHANINTR","cat":"Italian","tags":"","rating":4.1,"reviews":238,"price":500,"price_src":"scraped","dist":1664,"total":78.5,"sr":19.5,"sg":20,"sp":15,"st":4,"sd":15.0,"su":5,"groups":"Yes","reserve":"Yes","closes_late":"No","url":"https://www.google.com/maps/search/?api=1&query=Caf%C3%A9%20Craft%20by%20CHANINTR&query_place_id=ChIJu5Vzp3Of4jARINBGarbKq34","lat":13.7387527,"lng":100.5843719},{"rank":89,"name":"Kenji’s Lab","cat":"Japanese","tags":"","rating":4.6,"reviews":439,"price":1100,"price_src":"scraped","dist":1450,"total":78.4,"sr":21.8,"sg":20,"sp":11.6,"st":4,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Kenji%E2%80%99s%20Lab&query_place_id=ChIJSXZuFVKe4jARv_g_Qlm5CCE","lat":13.736749,"lng":100.5844427},{"rank":90,"name":"SEA Bangkok","cat":"Thai","tags":"","rating":4.8,"reviews":627,"price":1250,"price_src":"scraped","dist":1510,"total":77.8,"sr":22.9,"sg":20,"sp":9.9,"st":4,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=SEA%20Bangkok&query_place_id=ChIJReRnXaef4jARh8acmdEgBaY","lat":13.7377441,"lng":100.5817778},{"rank":91,"name":"ฟ้าปลาทาน มาร์เช่ ทองหล่อ Fá Plā Tahń Marché Thonglor","cat":"Chinese","tags":"","rating":4.4,"reviews":60,"price":300,"price_src":"scraped","dist":462,"total":77.6,"sr":18.6,"sg":12,"sp":15,"st":11,"sd":15.0,"su":6,"groups":"Yes","reserve":"No","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=%E0%B8%9F%E0%B9%89%E0%B8%B2%E0%B8%9B%E0%B8%A5%E0%B8%B2%E0%B8%97%E0%B8%B2%E0%B8%99%20%E0%B8%A1%E0%B8%B2%E0%B8%A3%E0%B9%8C%E0%B9%80%E0%B8%8A%E0%B9%88%20%E0%B8%97%E0%B8%AD%E0%B8%87%E0%B8%AB%E0%B8%A5%E0%B9%88%E0%B8%AD%20F%C3%A1%20Pl%C4%81%20Tah%C5%84%20March%C3%A9%20Thonglor&query_place_id=ChIJv4J99vOf4jARv8JznvFOfbE","lat":13.728343,"lng":100.5810975},{"rank":92,"name":"The Bar Italian Thonglor","cat":"Italian","tags":"","rating":4.7,"reviews":496,"price":1250,"price_src":"scraped","dist":1581,"total":77.2,"sr":22.3,"sg":20,"sp":9.9,"st":4,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=The%20Bar%20Italian%20Thonglor&query_place_id=ChIJL2QZHFSe4jARiJ3bfNaDY4Q","lat":13.7383419,"lng":100.5792687},{"rank":93,"name":"VIVI Tuscan Kitchen","cat":"Italian","tags":"","rating":4.2,"reviews":33,"price":350,"price_src":"scraped","dist":1210,"total":77.2,"sr":17.2,"sg":20,"sp":15,"st":4,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=VIVI%20Tuscan%20Kitchen&query_place_id=ChIJAVpCdtGf4jARU54mvohc4tA","lat":13.7349854,"lng":100.5822659},{"rank":94,"name":"Sho 小料理 翔","cat":"Japanese","tags":"Hotpot/Shabu","rating":4.7,"reviews":344,"price":1050,"price_src":"estimated (category median)","dist":1305,"total":76.9,"sr":21.8,"sg":20,"sp":12.2,"st":4,"sd":12.9,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Sho%20%E5%B0%8F%E6%96%99%E7%90%86%20%E7%BF%94&query_place_id=ChIJ8YTkvxuf4jARV0ZswO1FQBw","lat":13.7343174,"lng":100.5869244},{"rank":95,"name":"Koryori Mikami","cat":"Japanese","tags":"","rating":4.5,"reviews":158,"price":1100,"price_src":"scraped","dist":1718,"total":76.8,"sr":20.2,"sg":20,"sp":11.6,"st":4,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Koryori%20Mikami&query_place_id=ChIJKVac8SGf4jARxY6UggsYzjg","lat":13.7392281,"lng":100.5845097},{"rank":96,"name":"In the Mood for Love","cat":"Japanese","tags":"","rating":4.4,"reviews":252,"price":1050,"price_src":"estimated (category median)","dist":713,"total":76.6,"sr":20.5,"sg":20,"sp":12.2,"st":7,"sd":12.9,"su":4,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=In%20the%20Mood%20for%20Love&query_place_id=ChIJuUjrVaif4jAR_71x5O2CRCI","lat":13.729186,"lng":100.5849533},{"rank":97,"name":"Shabubu Thonglor","cat":"Japanese","tags":"Buffet; Hotpot/Shabu","rating":4.7,"reviews":64,"price":500,"price_src":"scraped","dist":882,"total":76.6,"sr":19.6,"sg":12,"sp":15,"st":7,"sd":15.0,"su":8,"groups":"Yes","reserve":"No","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Shabubu%20Thonglor&query_place_id=ChIJ_YXXNNuf4jAR2GLwNOWdCHE","lat":13.7313003,"lng":100.5844393},{"rank":98,"name":"Shishitei sukiyaki shabu","cat":"Japanese","tags":"Hotpot/Shabu","rating":4.8,"reviews":981,"price":2500,"price_src":"scraped","dist":881,"total":76.5,"sr":23.5,"sg":20,"sp":3,"st":7,"sd":15.0,"su":8,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Shishitei%20sukiyaki%20shabu&query_place_id=ChIJM_5XpNqf4jAR_Zd0Vf4erZc","lat":13.7309013,"lng":100.5851432},{"rank":99,"name":"Di Vino Bangkok | Italian Restaurant Thonglor","cat":"Italian","tags":"","rating":4.7,"reviews":382,"price":1300,"price_src":"scraped","dist":1153,"total":76.3,"sr":21.9,"sg":20,"sp":9.4,"st":4,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Di%20Vino%20Bangkok%20%7C%20Italian%20Restaurant%20Thonglor&query_place_id=ChIJi7QNHVOe4jARgyB05vA6Gk4","lat":13.7343485,"lng":100.582982},{"rank":100,"name":"Ok Shabu Shabu","cat":"Japanese","tags":"Hotpot/Shabu","rating":4.4,"reviews":991,"price":500,"price_src":"scraped","dist":1226,"total":76.3,"sr":22.3,"sg":12,"sp":15,"st":4,"sd":15.0,"su":8,"groups":"Yes","reserve":"No","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Ok%20Shabu%20Shabu&query_place_id=ChIJabDCHFWe4jAR8SCM2525qpg","lat":13.7347802,"lng":100.5776022},{"rank":101,"name":"Robatayaki & Sake AOKI / Japanese Restaurant","cat":"Japanese","tags":"","rating":4.9,"reviews":683,"price":1250,"price_src":"scraped","dist":1056,"total":76.2,"sr":23.3,"sg":20,"sp":9.9,"st":4,"sd":15.0,"su":4,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Robatayaki%20%26%20Sake%20AOKI%20%2F%20Japanese%20Restaurant&query_place_id=ChIJX8r2UQCf4jARuf_cb3DQ0gc","lat":13.7328514,"lng":100.5767722},{"rank":102,"name":"Honoho Izakaya at Thonglor","cat":"Japanese","tags":"","rating":4.4,"reviews":181,"price":1050,"price_src":"estimated (category median)","dist":908,"total":76.1,"sr":20.0,"sg":20,"sp":12.2,"st":7,"sd":12.9,"su":4,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Honoho%20Izakaya%20at%20Thonglor&query_place_id=ChIJL75Yf3Wf4jARJQEV6qWLvfo","lat":13.732247,"lng":100.5822421},{"rank":103,"name":"Shoutaian 2nd Rich","cat":"Japanese","tags":"Buffet; Yakiniku/BBQ","rating":4.8,"reviews":725,"price":2500,"price_src":"scraped","dist":767,"total":76.1,"sr":23.1,"sg":20,"sp":3,"st":7,"sd":15.0,"su":8,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Shoutaian%202nd%20Rich&query_place_id=ChIJmxoVfeOf4jARVWb_p58uYmA","lat":13.7310851,"lng":100.5811912},{"rank":104,"name":"Quilombo","cat":"Steakhouse","tags":"","rating":4.8,"reviews":138,"price":2500,"price_src":"scraped","dist":471,"total":75.9,"sr":20.9,"sg":20,"sp":3,"st":11,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Quilombo&query_place_id=ChIJg8dCPl-f4jARnAZS6MFTESk","lat":13.7283735,"lng":100.5800422},{"rank":105,"name":"Ryuzu Omakase","cat":"Japanese","tags":"","rating":4.9,"reviews":507,"price":2500,"price_src":"scraped","dist":511,"total":75.9,"sr":22.9,"sg":20,"sp":3,"st":11,"sd":15.0,"su":4,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Ryuzu%20Omakase&query_place_id=ChIJp7NXaw2f4jAReZoJXi1ViCo","lat":13.7287181,"lng":100.5816686},{"rank":106,"name":"Swirl Thonglor","cat":"Italian","tags":"","rating":4.7,"reviews":184,"price":500,"price_src":"estimated (category median)","dist":1124,"total":75.9,"sr":21.0,"sg":20,"sp":15,"st":4,"sd":12.9,"su":3,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Swirl%20Thonglor&query_place_id=ChIJoz4MEsOf4jARmyYaVSSEb7M","lat":13.734221,"lng":100.5794374},{"rank":107,"name":"17 Something • ทองหล่อ","cat":"Steakhouse","tags":"","rating":4.6,"reviews":257,"price":100,"price_src":"scraped","dist":1244,"total":75.8,"sr":21.1,"sg":20,"sp":9.7,"st":4,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=17%20Something%20%E2%80%A2%20%E0%B8%97%E0%B8%AD%E0%B8%87%E0%B8%AB%E0%B8%A5%E0%B9%88%E0%B8%AD&query_place_id=ChIJ41LZs-Wf4jARLa6T22JFzys","lat":13.7351991,"lng":100.582884},{"rank":108,"name":"Kani Tengoku","cat":"Japanese","tags":"Buffet","rating":4.7,"reviews":678,"price":2500,"price_src":"scraped","dist":865,"total":75.7,"sr":22.7,"sg":20,"sp":3,"st":7,"sd":15.0,"su":8,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Kani%20Tengoku&query_place_id=ChIJdb0fZICf4jARTjLFdnWtZfA","lat":13.7316192,"lng":100.5784032},{"rank":109,"name":"Choongman Chicken At Ekkamai","cat":"Korean","tags":"","rating":4.9,"reviews":687,"price":300,"price_src":"scraped","dist":1216,"total":75.3,"sr":23.3,"sg":12,"sp":15,"st":4,"sd":15.0,"su":6,"groups":"Yes","reserve":"No","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Choongman%20Chicken%20At%20Ekkamai&query_place_id=ChIJ13_gCsif4jARZ4p-3TcHcO8","lat":13.7336134,"lng":100.5865254},{"rank":110,"name":"R-HAAN","cat":"Thai","tags":"","rating":4.3,"reviews":1034,"price":2500,"price_src":"scraped","dist":859,"total":75.0,"sr":22.0,"sg":20,"sp":3,"st":7,"sd":15.0,"su":8,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=R-HAAN&query_place_id=ChIJ-dmMWquf4jAREDFTxbjSFh0","lat":13.7318321,"lng":100.5795655},{"rank":111,"name":"Koryori Musubi","cat":"Japanese","tags":"","rating":4.7,"reviews":50,"price":1200,"price_src":"scraped","dist":1745,"total":74.8,"sr":19.3,"sg":20,"sp":10.5,"st":4,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Koryori%20Musubi&query_place_id=ChIJ7alucPSf4jAR6svgfbBUOUs","lat":13.7398909,"lng":100.5808694},{"rank":112,"name":"Sushi Juban Takumi Thonglor 寿司十番匠トンロー","cat":"Japanese","tags":"","rating":4.9,"reviews":3854,"price":2500,"price_src":"scraped","dist":1573,"total":74.7,"sr":24.7,"sg":20,"sp":3,"st":4,"sd":15.0,"su":8,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Sushi%20Juban%20Takumi%20Thonglor%20%E5%AF%BF%E5%8F%B8%E5%8D%81%E7%95%AA%E5%8C%A0%E3%83%88%E3%83%B3%E3%83%AD%E3%83%BC&query_place_id=ChIJhQpOHFSe4jAR-rDq_LXsjrk","lat":13.738292,"lng":100.579515},{"rank":113,"name":"Takibi Izakaya","cat":"Japanese","tags":"Yakiniku/BBQ","rating":4.7,"reviews":62,"price":1050,"price_src":"estimated (category median)","dist":1018,"total":74.7,"sr":19.6,"sg":20,"sp":12.2,"st":4,"sd":12.9,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Takibi%20Izakaya&query_place_id=ChIJeQMx2Lef4jARLNQjjjNA0hw","lat":13.7333349,"lng":100.5814067},{"rank":114,"name":"Foong","cat":"Thai","tags":"","rating":4.4,"reviews":144,"price":1250,"price_src":"scraped","dist":1433,"total":74.6,"sr":19.7,"sg":20,"sp":9.9,"st":4,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Foong&query_place_id=ChIJf51BpYyf4jAR9m_UJYTBsrA","lat":13.737088,"lng":100.5808495},{"rank":115,"name":"The Kitchen by Monika","cat":"Italian","tags":"","rating":4.8,"reviews":57,"price":1250,"price_src":"scraped","dist":1582,"total":74.6,"sr":19.7,"sg":20,"sp":9.9,"st":4,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=The%20Kitchen%20by%20Monika&query_place_id=ChIJD74gyE2e4jARXSLPItgafEc","lat":13.7365781,"lng":100.5880187},{"rank":116,"name":"Hakata Tempura Nagaoka Ekkamai","cat":"Japanese","tags":"","rating":4.5,"reviews":112,"price":1300,"price_src":"scraped","dist":1547,"total":74.1,"sr":19.7,"sg":20,"sp":9.4,"st":4,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Hakata%20Tempura%20Nagaoka%20Ekkamai&query_place_id=ChIJx3nFY_af4jAR0tUkylt0IkA","lat":13.7361488,"lng":100.5881336},{"rank":117,"name":"LAVA Fire Grill","cat":"Steakhouse","tags":"","rating":4.7,"reviews":845,"price":2500,"price_src":"scraped","dist":934,"total":74.0,"sr":23.0,"sg":20,"sp":3,"st":7,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=LAVA%20Fire%20Grill&query_place_id=ChIJgUiCawef4jARRhEvWl__5yw","lat":13.7324398,"lng":100.5824656},{"rank":118,"name":"Fuego","cat":"Thai","tags":"","rating":4.8,"reviews":618,"price":2500,"price_src":"scraped","dist":973,"total":73.9,"sr":22.9,"sg":20,"sp":3,"st":7,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Fuego&query_place_id=ChIJN7fHY7Gf4jAR8jjTD8UA81k","lat":13.73289,"lng":100.5818201},{"rank":119,"name":"IRODORI Japanese Ramen Cafe / Ramen Restaurant","cat":"Japanese","tags":"","rating":4.7,"reviews":167,"price":1050,"price_src":"estimated (category median)","dist":1034,"total":73.9,"sr":20.8,"sg":20,"sp":12.2,"st":4,"sd":12.9,"su":4,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=IRODORI%20Japanese%20Ramen%20Cafe%20%2F%20Ramen%20Restaurant&query_place_id=ChIJs0hUml6f4jAR193m-mkGL_s","lat":13.7334789,"lng":100.5801843},{"rank":120,"name":"Bratbox Bistro & Bar Ekkamai - Pizza - Burger - Sausages (สาขาเอกมัย 21)","cat":"Italian","tags":"","rating":4.9,"reviews":219,"price":500,"price_src":"scraped","dist":1790,"total":73.8,"sr":21.8,"sg":12,"sp":15,"st":4,"sd":15.0,"su":6,"groups":"Yes","reserve":"No","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Bratbox%20Bistro%20%26%20Bar%20Ekkamai%20-%20Pizza%20-%20Burger%20-%20Sausages%20(%E0%B8%AA%E0%B8%B2%E0%B8%82%E0%B8%B2%E0%B9%80%E0%B8%AD%E0%B8%81%E0%B8%A1%E0%B8%B1%E0%B8%A2%2021)&query_place_id=ChIJ9Qj-YguZ4jARS-h5QQ2o_7k","lat":13.7387675,"lng":100.5878565},{"rank":121,"name":"Ror Ruea","cat":"Thai","tags":"","rating":4.5,"reviews":533,"price":300,"price_src":"scraped","dist":1501,"total":73.8,"sr":21.8,"sg":12,"sp":15,"st":4,"sd":15.0,"su":6,"groups":"Yes","reserve":"No","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Ror%20Ruea&query_place_id=ChIJjbuxL1Ke4jARDpcJcXLv0X0","lat":13.7374091,"lng":100.5836679},{"rank":122,"name":"SAOLE.BANGKOK","cat":"Thai","tags":"","rating":4.3,"reviews":205,"price":1400,"price_src":"scraped","dist":1651,"total":73.1,"sr":19.9,"sg":20,"sp":8.2,"st":4,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=SAOLE.BANGKOK&query_place_id=ChIJlSvqtF2f4jARZQIAY5R2wzY","lat":13.7390451,"lng":100.5811597},{"rank":123,"name":"El Gaucho Thonglor","cat":"Steakhouse","tags":"","rating":4.5,"reviews":636,"price":2500,"price_src":"scraped","dist":725,"total":73.0,"sr":22.0,"sg":20,"sp":3,"st":7,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=El%20Gaucho%20Thonglor&query_place_id=ChIJAVEPwKyf4jAR34XmLbIQks4","lat":13.7306617,"lng":100.581687},{"rank":124,"name":"Fortune Cookie American Chinese Eatery - Thong Lor 21","cat":"Chinese","tags":"Buffet","rating":4.5,"reviews":64,"price":400,"price_src":"scraped","dist":1406,"total":73.0,"sr":19.0,"sg":12,"sp":15,"st":4,"sd":15.0,"su":8,"groups":"Yes","reserve":"No","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Fortune%20Cookie%20American%20Chinese%20Eatery%20-%20Thong%20Lor%2021&query_place_id=ChIJ2xyVUr6f4jARfqzd8c8ilKM","lat":13.7366005,"lng":100.5833457},{"rank":125,"name":"Kitaohji Bangkok","cat":"Japanese","tags":"","rating":4.5,"reviews":415,"price":2500,"price_src":"scraped","dist":724,"total":72.4,"sr":21.4,"sg":20,"sp":3,"st":7,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Kitaohji%20Bangkok&query_place_id=ChIJRUMLwayf4jARE-aLqeECWx8","lat":13.7304513,"lng":100.5826891},{"rank":126,"name":"Honmono","cat":"Japanese","tags":"Buffet","rating":4.5,"reviews":678,"price":2500,"price_src":"scraped","dist":1547,"total":72.1,"sr":22.1,"sg":20,"sp":3,"st":4,"sd":15.0,"su":8,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Honmono&query_place_id=ChIJs4QERFOe4jARjqhHjl2iG0g","lat":13.7380498,"lng":100.5821859},{"rank":127,"name":"Menya Fuku","cat":"Japanese","tags":"","rating":4.2,"reviews":244,"price":300,"price_src":"scraped","dist":1111,"total":71.8,"sr":19.8,"sg":12,"sp":15,"st":4,"sd":15.0,"su":6,"groups":"Yes","reserve":"No","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Menya%20Fuku&query_place_id=ChIJL9QU3w-f4jAReBmBHCHDYjg","lat":13.7341754,"lng":100.5801518},{"rank":128,"name":"S&P Thong Lo","cat":"Thai","tags":"","rating":4.3,"reviews":371,"price":300,"price_src":"scraped","dist":1655,"total":71.7,"sr":20.7,"sg":12,"sp":15,"st":4,"sd":15.0,"su":5,"groups":"Yes","reserve":"No","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=S%26P%20Thong%20Lo&query_place_id=ChIJbWraUlKe4jARXrfWilghZ7E","lat":13.7387521,"lng":100.5840186},{"rank":129,"name":"Miyabi Kappo","cat":"Japanese","tags":"Buffet","rating":4.6,"reviews":363,"price":2500,"price_src":"scraped","dist":1581,"total":71.6,"sr":21.6,"sg":20,"sp":3,"st":4,"sd":15.0,"su":8,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Miyabi%20Kappo&query_place_id=ChIJiz28e1Ge4jARumeDbA7seoA","lat":13.7383035,"lng":100.582687},{"rank":130,"name":"鮨割烹 十一 Sushi kappo Juichi Thonglor","cat":"Japanese","tags":"","rating":5,"reviews":11,"price":1050,"price_src":"estimated (category median)","dist":1577,"total":71.4,"sr":18.3,"sg":20,"sp":12.2,"st":4,"sd":12.9,"su":4,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=%E9%AE%A8%E5%89%B2%E7%83%B9%20%E5%8D%81%E4%B8%80%20Sushi%20kappo%20Juichi%20Thonglor&query_place_id=ChIJvy_HlLuf4jARyNPVHGyd2MQ","lat":13.7383118,"lng":100.5793755},{"rank":131,"name":"Momiji Omakase","cat":"Japanese","tags":"","rating":4.5,"reviews":173,"price":2500,"price_src":"scraped","dist":957,"total":71.3,"sr":20.3,"sg":20,"sp":3,"st":7,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Momiji%20Omakase&query_place_id=ChIJb8cJ5gif4jAR-IejoaA_g_8","lat":13.7327457,"lng":100.5818698},{"rank":132,"name":"Crackhouse","cat":"Thai","tags":"","rating":4.6,"reviews":57,"price":350,"price_src":"scraped","dist":1216,"total":71.1,"sr":19.1,"sg":12,"sp":15,"st":4,"sd":15.0,"su":6,"groups":"Yes","reserve":"No","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Crackhouse&query_place_id=ChIJzWTyO86f4jARc0GfQw7lfZE","lat":13.7350395,"lng":100.5822979},{"rank":133,"name":"Otto Italian Restaurant","cat":"Italian","tags":"","rating":4.4,"reviews":183,"price":2500,"price_src":"scraped","dist":704,"total":71.1,"sr":20.1,"sg":20,"sp":3,"st":7,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Otto%20Italian%20Restaurant&query_place_id=ChIJhaPHJFCe4jARqrJ2JotywgU","lat":13.7304375,"lng":100.5819169},{"rank":134,"name":"NOWAKI BKK","cat":"Japanese","tags":"","rating":4.8,"reviews":71,"price":2500,"price_src":"scraped","dist":934,"total":71.0,"sr":20.0,"sg":20,"sp":3,"st":7,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=NOWAKI%20BKK&query_place_id=ChIJkw4mk6if4jARPO_arAAJ3yU","lat":13.7324398,"lng":100.5824656},{"rank":135,"name":"Pizza Amore Nostro - Thonglo 10","cat":"Italian","tags":"","rating":4.7,"reviews":84,"price":500,"price_src":"estimated (category median)","dist":870,"total":70.8,"sr":19.9,"sg":12,"sp":15,"st":7,"sd":12.9,"su":4,"groups":"Yes","reserve":"No","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Pizza%20Amore%20Nostro%20-%20Thonglo%2010&query_place_id=ChIJt8rbKe6f4jARp81GjVKyoWA","lat":13.7308064,"lng":100.5851066},{"rank":136,"name":"Took Lae Dee Restaurant","cat":"Thai","tags":"","rating":4.4,"reviews":398,"price":100,"price_src":"scraped","dist":749,"total":70.8,"sr":21.1,"sg":12,"sp":9.7,"st":7,"sd":15.0,"su":6,"groups":"Yes","reserve":"No","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Took%20Lae%20Dee%20Restaurant&query_place_id=ChIJfwSd7qyf4jAR7tQi7OIm9t4","lat":13.7308719,"lng":100.5817669},{"rank":137,"name":"BAPSANG - the COMMONS Thonglor","cat":"Korean","tags":"","rating":4.3,"reviews":78,"price":300,"price_src":"scraped","dist":1207,"total":70.6,"sr":18.6,"sg":12,"sp":15,"st":4,"sd":15.0,"su":6,"groups":"Yes","reserve":"No","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=BAPSANG%20-%20the%20COMMONS%20Thonglor&query_place_id=ChIJeUKR6D-f4jAR--RBDkRo2a4","lat":13.7349737,"lng":100.5821383},{"rank":138,"name":"Greenhouse Congee & Noodles by Landmark","cat":"Chinese","tags":"","rating":4.5,"reviews":44,"price":350,"price_src":"scraped","dist":1125,"total":70.5,"sr":18.5,"sg":12,"sp":15,"st":4,"sd":15.0,"su":6,"groups":"Yes","reserve":"No","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Greenhouse%20Congee%20%26%20Noodles%20by%20Landmark&query_place_id=ChIJcXguQ7yf4jAR1Ctr2jAg9is","lat":13.734256,"lng":100.5796808},{"rank":139,"name":"Hangetsu Omakase","cat":"Japanese","tags":"","rating":4.9,"reviews":322,"price":2500,"price_src":"scraped","dist":1340,"total":70.3,"sr":22.3,"sg":20,"sp":3,"st":4,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Hangetsu%20Omakase&query_place_id=ChIJ213CuBqf4jAR4BvW3WxQH8I","lat":13.7346612,"lng":100.5869579},{"rank":140,"name":"Soho Pizza (Thonglor)","cat":"Italian","tags":"","rating":4.1,"reviews":214,"price":500,"price_src":"estimated (category median)","dist":958,"total":70.3,"sr":19.4,"sg":12,"sp":15,"st":7,"sd":12.9,"su":4,"groups":"Yes","reserve":"No","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Soho%20Pizza%20(Thonglor)&query_place_id=ChIJvVftTJif4jARV3vIjW1tFek","lat":13.7326829,"lng":100.5823455},{"rank":141,"name":"Monkeys C h i n o i s","cat":"Chinese","tags":"","rating":4,"reviews":3,"price":450,"price_src":"estimated (category median)","dist":1200,"total":69.7,"sr":13.8,"sg":20,"sp":15,"st":4,"sd":12.9,"su":4,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Monkeys%20C%20h%20i%20n%20o%20i%20s&query_place_id=ChIJj8JYNFOe4jARgWFWCYFruYE","lat":13.7347033,"lng":100.5833495},{"rank":142,"name":"La Bottega Bangkok","cat":"Italian","tags":"","rating":4.5,"reviews":480,"price":2500,"price_src":"scraped","dist":1020,"total":69.6,"sr":21.6,"sg":20,"sp":3,"st":4,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=La%20Bottega%20Bangkok&query_place_id=ChIJTejut6qf4jAR6iWBQYb7PHY","lat":13.7321378,"lng":100.576059},{"rank":143,"name":"EASY! buddy theCOMMONS Thonglor","cat":"Thai","tags":"","rating":4.7,"reviews":243,"price":500,"price_src":"estimated (category median)","dist":1223,"total":69.2,"sr":21.3,"sg":12,"sp":15,"st":4,"sd":12.9,"su":4,"groups":"Yes","reserve":"No","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=EASY!%20buddy%20theCOMMONS%20Thonglor&query_place_id=ChIJO815Y2yf4jAR-yussfNRQaU","lat":13.7351243,"lng":100.5821469},{"rank":144,"name":"Juksunchae","cat":"Korean","tags":"","rating":4.9,"reviews":129,"price":2500,"price_src":"scraped","dist":1055,"total":69.1,"sr":21.1,"sg":20,"sp":3,"st":4,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Juksunchae&query_place_id=ChIJ_xRKVDuf4jAR3CyXriUaZGA","lat":13.7327986,"lng":100.57668},{"rank":145,"name":"割烹 夢 Kappo Yume bangkok ความฝันที่เป็นจริง","cat":"Japanese","tags":"","rating":4.9,"reviews":129,"price":2500,"price_src":"scraped","dist":1873,"total":69.1,"sr":21.1,"sg":20,"sp":3,"st":4,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=%E5%89%B2%E7%83%B9%20%E5%A4%A2%20Kappo%20Yume%20bangkok%20%E0%B8%84%E0%B8%A7%E0%B8%B2%E0%B8%A1%E0%B8%9D%E0%B8%B1%E0%B8%99%E0%B8%97%E0%B8%B5%E0%B9%88%E0%B9%80%E0%B8%9B%E0%B9%87%E0%B8%99%E0%B8%88%E0%B8%A3%E0%B8%B4%E0%B8%87&query_place_id=ChIJ_wD-Xg2f4jARdeSSy4RnohE","lat":13.7406421,"lng":100.5845862},{"rank":146,"name":"Nobu","cat":"Japanese","tags":"","rating":4.5,"reviews":287,"price":2500,"price_src":"scraped","dist":1049,"total":69.0,"sr":21.0,"sg":20,"sp":3,"st":4,"sd":15.0,"su":6,"groups":"Yes","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Nobu&query_place_id=ChIJLU92JFOe4jARFz2kE6QXUCE","lat":13.7334711,"lng":100.582614},{"rank":147,"name":"Boon Tong Kiat Singapore Chicken Rice","cat":"Chinese","tags":"","rating":4.3,"reviews":857,"price":100,"price_src":"scraped","dist":1109,"total":68.5,"sr":21.8,"sg":12,"sp":9.7,"st":4,"sd":15.0,"su":6,"groups":"Yes","reserve":"No","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Boon%20Tong%20Kiat%20Singapore%20Chicken%20Rice&query_place_id=ChIJR7gcH1Oe4jARA4YYHTzJMx4","lat":13.7339957,"lng":100.5827349},{"rank":148,"name":"Gokfayuen","cat":"Chinese","tags":"","rating":4.7,"reviews":1197,"price":300,"price_src":"scraped","dist":797,"total":68.4,"sr":23.4,"sg":0,"sp":15,"st":7,"sd":15.0,"su":8,"groups":"No","reserve":"No","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Gokfayuen&query_place_id=ChIJsXo-R1Oe4jAR0uX1KhmJSbI","lat":13.731363,"lng":100.5810023},{"rank":149,"name":"Thonglor Rumba / Restaurant","cat":"Italian","tags":"","rating":4.8,"reviews":108,"price":300,"price_src":"scraped","dist":1098,"total":67.6,"sr":20.6,"sg":8,"sp":15,"st":4,"sd":15.0,"su":5,"groups":"No","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Thonglor%20Rumba%20%2F%20Restaurant&query_place_id=ChIJd-nVG2ef4jARMWPeq0a1aYw","lat":13.7340067,"lng":100.5795742},{"rank":150,"name":"闘鶏 Shamo Sumibi Yakitori Bkk","cat":"Japanese","tags":"Yakiniku/BBQ","rating":4.4,"reviews":64,"price":900,"price_src":"scraped","dist":1443,"total":67.6,"sr":18.7,"sg":8,"sp":13.9,"st":4,"sd":15.0,"su":8,"groups":"No","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=%E9%97%98%E9%B6%8F%20Shamo%20Sumibi%20Yakitori%20Bkk&query_place_id=ChIJvdN-TyGf4jARwH-qEPO89k4","lat":13.7367819,"lng":100.5840797},{"rank":151,"name":"Patara Fine Thai Cuisine","cat":"Thai","tags":"","rating":4.5,"reviews":656,"price":1400,"price_src":"scraped","dist":1388,"total":67.2,"sr":22.0,"sg":12,"sp":8.2,"st":4,"sd":15.0,"su":6,"groups":"Yes","reserve":"No","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Patara%20Fine%20Thai%20Cuisine&query_place_id=ChIJv99arlOe4jARCJI52pBehiQ","lat":13.736677,"lng":100.5812824},{"rank":152,"name":"เฮียด่วน Hereduan - 段哥 Thai Street food","cat":"Thai","tags":"","rating":4.9,"reviews":2918,"price":300,"price_src":"scraped","dist":1786,"total":66.7,"sr":24.7,"sg":0,"sp":15,"st":4,"sd":15.0,"su":8,"groups":"No","reserve":"No","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=%E0%B9%80%E0%B8%AE%E0%B8%B5%E0%B8%A2%E0%B8%94%E0%B9%88%E0%B8%A7%E0%B8%99%20Hereduan%20-%20%E6%AE%B5%E5%93%A5%20Thai%20Street%20food&query_place_id=ChIJq_BpLjKf4jARDoqV1y1s8NU","lat":13.7383527,"lng":100.5886098},{"rank":153,"name":"Father & Son´s - Jungle Smash on Ekkamai 21","cat":"Thai","tags":"","rating":4.9,"reviews":84,"price":500,"price_src":"scraped","dist":1780,"total":65.4,"sr":20.5,"sg":8,"sp":15,"st":4,"sd":12.9,"su":5,"groups":"No","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Father%20%26%20Son%C2%B4s%20-%20Jungle%20Smash%20on%20Ekkamai%2021&query_place_id=ChIJL-Jh14Wf4jARQFZXu0e2arg","lat":13.7384738,"lng":100.5882553},{"rank":154,"name":"Sushi Kubota","cat":"Japanese","tags":"","rating":4.9,"reviews":144,"price":1050,"price_src":"estimated (category median)","dist":723,"total":65.3,"sr":21.2,"sg":8,"sp":12.2,"st":7,"sd":12.9,"su":4,"groups":"No","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Sushi%20Kubota&query_place_id=ChIJE470U6Kd4jARI_KjbgV2nXo","lat":13.7306035,"lng":100.581968},{"rank":155,"name":"Cho Cha Ta","cat":"Thai","tags":"","rating":4.6,"reviews":5,"price":500,"price_src":"estimated (category median)","dist":895,"total":64.9,"sr":16.2,"sg":12,"sp":15,"st":7,"sd":10.7,"su":4,"groups":"Yes","reserve":"No","closes_late":null,"url":"https://www.google.com/maps/search/?api=1&query=Cho%20Cha%20Ta&query_place_id=ChIJcf7vNzaf4jAR_mIlkgs-8n4","lat":13.7315894,"lng":100.5840823},{"rank":156,"name":"PIZZA MARIO","cat":"Italian","tags":"","rating":4,"reviews":90,"price":500,"price_src":"estimated (category median)","dist":897,"total":64.8,"sr":17.9,"sg":8,"sp":15,"st":7,"sd":12.9,"su":4,"groups":"No","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=PIZZA%20MARIO&query_place_id=ChIJNfkCVBKf4jARpCZL55E2UG0","lat":13.732009,"lng":100.582875},{"rank":157,"name":"Kozuri Hand Roll theCOMMONS Thonglor","cat":"Japanese","tags":"","rating":4.9,"reviews":123,"price":1100,"price_src":"scraped","dist":1221,"total":64.6,"sr":21.0,"sg":8,"sp":11.6,"st":4,"sd":15.0,"su":5,"groups":"No","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Kozuri%20Hand%20Roll%20theCOMMONS%20Thonglor&query_place_id=ChIJwamNpiKf4jARz6hNUzClAFI","lat":13.735098,"lng":100.5821506},{"rank":158,"name":"A RAMEN ราเมงข้อสอบ (Marche ทองหล่อ)","cat":"Japanese","tags":"","rating":4.7,"reviews":421,"price":1050,"price_src":"estimated (category median)","dist":456,"total":64.3,"sr":22.1,"sg":0,"sp":12.2,"st":11,"sd":15.0,"su":4,"groups":"No","reserve":"No","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=A%20RAMEN%20%E0%B8%A3%E0%B8%B2%E0%B9%80%E0%B8%A1%E0%B8%87%E0%B8%82%E0%B9%89%E0%B8%AD%E0%B8%AA%E0%B8%AD%E0%B8%9A%20(Marche%20%E0%B8%97%E0%B8%AD%E0%B8%87%E0%B8%AB%E0%B8%A5%E0%B9%88%E0%B8%AD)&query_place_id=ChIJnyHKtWif4jAROsClH_JhU4E","lat":13.7282928,"lng":100.5810668},{"rank":159,"name":"Kub Kao Kub Pla Thonglor","cat":"Thai","tags":"","rating":4,"reviews":158,"price":500,"price_src":"estimated (category median)","dist":473,"total":64.3,"sr":18.7,"sg":8,"sp":15,"st":11,"sd":8.6,"su":3,"groups":"No","reserve":"Yes","closes_late":null,"url":"https://www.google.com/maps/search/?api=1&query=Kub%20Kao%20Kub%20Pla%20Thonglor&query_place_id=ChIJg6UQIFef4jARDavoLLJ-OVs","lat":13.7284507,"lng":100.581037},{"rank":160,"name":"HAND-so-ROLL","cat":"Japanese","tags":"","rating":4.7,"reviews":189,"price":1100,"price_src":"scraped","dist":1043,"total":63.6,"sr":21.0,"sg":8,"sp":11.6,"st":4,"sd":15.0,"su":4,"groups":"No","reserve":"Yes","closes_late":"No","url":"https://www.google.com/maps/search/?api=1&query=HAND-so-ROLL&query_place_id=ChIJM708znCf4jARJRFagam0M9s","lat":13.7335394,"lng":100.5799058},{"rank":161,"name":"和カフェ手毬 Cafe Temari","cat":"Japanese","tags":"","rating":4.8,"reviews":375,"price":1050,"price_src":"estimated (category median)","dist":1054,"total":63.3,"sr":22.2,"sg":8,"sp":12.2,"st":4,"sd":12.9,"su":4,"groups":"No","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=%E5%92%8C%E3%82%AB%E3%83%95%E3%82%A7%E6%89%8B%E6%AF%AC%20Cafe%20Temari&query_place_id=ChIJ54w1fZOf4jARYNzUuwkdvMo","lat":13.7334468,"lng":100.5829323},{"rank":162,"name":"Odashi Hakkei","cat":"Japanese","tags":"Hotpot/Shabu","rating":4.6,"reviews":83,"price":1050,"price_src":"estimated (category median)","dist":1326,"total":62.7,"sr":19.6,"sg":8,"sp":12.2,"st":4,"sd":12.9,"su":6,"groups":"No","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Odashi%20Hakkei&query_place_id=ChIJA32Yrsaf4jARYFzmDQ29g8k","lat":13.7346812,"lng":100.5866595},{"rank":163,"name":"Antico Fornaio - Crafted Italian focaccia - Thong Lo","cat":"Italian","tags":"","rating":4.6,"reviews":14,"price":300,"price_src":"scraped","dist":1149,"total":62.3,"sr":17.4,"sg":8,"sp":15,"st":4,"sd":12.9,"su":5,"groups":"No","reserve":"Yes","closes_late":"No","url":"https://www.google.com/maps/search/?api=1&query=Antico%20Fornaio%20-%20Crafted%20Italian%20focaccia%20-%20Thong%20Lo&query_place_id=ChIJscNgsS6f4jARtnDGcPuZ9gw","lat":13.7344821,"lng":100.581845},{"rank":164,"name":"Covino - Cafe & Italian Bistro in Bangkok","cat":"Italian","tags":"","rating":4.6,"reviews":79,"price":350,"price_src":"scraped","dist":1653,"total":62.3,"sr":19.6,"sg":8,"sp":15,"st":4,"sd":10.7,"su":5,"groups":"No","reserve":"Yes","closes_late":null,"url":"https://www.google.com/maps/search/?api=1&query=Covino%20-%20Cafe%20%26%20Italian%20Bistro%20in%20Bangkok&query_place_id=ChIJQ9lwX4mf4jAREs_qMxCDG6g","lat":13.7389534,"lng":100.5826795},{"rank":165,"name":"ทองสิบ ข้าวต้ม & บาร์ Thong 10 - Thonglor","cat":"Thai","tags":"","rating":5,"reviews":42,"price":300,"price_src":"scraped","dist":934,"total":61.9,"sr":19.9,"sg":0,"sp":15,"st":7,"sd":15.0,"su":5,"groups":"No","reserve":"No","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=%E0%B8%97%E0%B8%AD%E0%B8%87%E0%B8%AA%E0%B8%B4%E0%B8%9A%20%E0%B8%82%E0%B9%89%E0%B8%B2%E0%B8%A7%E0%B8%95%E0%B9%89%E0%B8%A1%20%26%20%E0%B8%9A%E0%B8%B2%E0%B8%A3%E0%B9%8C%20Thong%2010%20-%20Thonglor&query_place_id=ChIJictCMACf4jARR_Z-l5AIu9Q","lat":13.7324398,"lng":100.5824656},{"rank":166,"name":"Thong Grill Hide Thai BBQ & Shabu","cat":"Japanese","tags":"Hotpot/Shabu","rating":4.9,"reviews":117,"price":700,"price_src":"scraped","dist":854,"total":60.7,"sr":21.0,"sg":0,"sp":15,"st":7,"sd":10.7,"su":7,"groups":"No","reserve":"No","closes_late":null,"url":"https://www.google.com/maps/search/?api=1&query=Thong%20Grill%20Hide%20Thai%20BBQ%20%26%20Shabu&query_place_id=ChIJ177pi_ef4jARA-0TiGDKmqo","lat":13.7314662,"lng":100.578247},{"rank":167,"name":"Angelo's Pasta - Thong Lo 10","cat":"Italian","tags":"","rating":4.7,"reviews":81,"price":250,"price_src":"scraped","dist":870,"total":60.6,"sr":19.9,"sg":0,"sp":13.7,"st":7,"sd":15.0,"su":5,"groups":"No","reserve":"No","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Angelo's%20Pasta%20-%20Thong%20Lo%2010&query_place_id=ChIJ0dFlMTyf4jARWEp38Y1GSBU","lat":13.7308168,"lng":100.5850905},{"rank":168,"name":"The Tepp modern teppanyaki Buffet","cat":"Japanese","tags":"Buffet","rating":5,"reviews":2,"price":1050,"price_src":"estimated (category median)","dist":1318,"total":60.3,"sr":16.4,"sg":12,"sp":12.2,"st":4,"sd":10.7,"su":5,"groups":"Yes","reserve":"No","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=The%20Tepp%20modern%20teppanyaki%20Buffet&query_place_id=ChIJzQnXB1We4jARh2x-AGhBTwo","lat":13.735383,"lng":100.576744},{"rank":169,"name":"Pasta Boom by Ermanno Lelli","cat":"Italian","tags":"","rating":5,"reviews":5,"price":300,"price_src":"scraped","dist":726,"total":58.4,"sr":17.4,"sg":0,"sp":15,"st":7,"sd":15.0,"su":4,"groups":"No","reserve":"No","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Pasta%20Boom%20by%20Ermanno%20Lelli&query_place_id=ChIJUZ1ZyW2f4jARBbrL6H5JtH0","lat":13.7307248,"lng":100.5809388},{"rank":170,"name":"Kimukatsu Thonglor","cat":"Japanese","tags":"","rating":4.8,"reviews":873,"price":500,"price_src":"scraped","dist":1162,"total":58.2,"sr":23.3,"sg":0,"sp":15,"st":4,"sd":12.9,"su":3,"groups":"No","reserve":"No","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Kimukatsu%20Thonglor&query_place_id=ChIJaTNLDA-f4jARyMBVUsjaXkc","lat":13.7346163,"lng":100.5817189},{"rank":171,"name":"소반 국수 불고기 포차 에까마이 | SOBAN Korean Noodles Bulgogi Pocha Ekkamai | ร้านโซบันกุกซู บุลโกกิ โพชา เอกมัย|","cat":"Japanese","tags":"","rating":5,"reviews":115,"price":300,"price_src":"scraped","dist":1056,"total":58.2,"sr":21.3,"sg":0,"sp":15,"st":4,"sd":12.9,"su":5,"groups":"No","reserve":"No","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=%EC%86%8C%EB%B0%98%20%EA%B5%AD%EC%88%98%20%EB%B6%88%EA%B3%A0%EA%B8%B0%20%ED%8F%AC%EC%B0%A8%20%EC%97%90%EA%B9%8C%EB%A7%88%EC%9D%B4%20%7C%20SOBAN%20Korean%20Noodles%20Bulgogi%20Pocha%20Ekkamai%20%7C%20%E0%B8%A3%E0%B9%89%E0%B8%B2%E0%B8%99%E0%B9%82%E0%B8%8B%E0%B8%9A%E0%B8%B1%E0%B8%99%E0%B8%81%E0%B8%B8%E0%B8%81%E0%B8%8B%E0%B8%B9%20%E0%B8%9A%E0%B8%B8%E0%B8%A5%E0%B9%82%E0%B8%81%E0%B8%81%E0%B8%B4%20%E0%B9%82%E0%B8%9E%E0%B8%8A%E0%B8%B2%20%E0%B9%80%E0%B8%AD%E0%B8%81%E0%B8%A1%E0%B8%B1%E0%B8%A2%7C&query_place_id=ChIJk9-xiG2f4jAR3oQQJ_RHq2Y","lat":13.7314851,"lng":100.5870725},{"rank":172,"name":"Endo Sushi","cat":"Japanese","tags":"","rating":4.6,"reviews":357,"price":1100,"price_src":"scraped","dist":971,"total":58.0,"sr":21.5,"sg":0,"sp":11.6,"st":7,"sd":12.9,"su":5,"groups":"No","reserve":"No","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Endo%20Sushi&query_place_id=ChIJk-V_M1Oe4jARqzVVg6aWdvQ","lat":13.7328876,"lng":100.5817229},{"rank":173,"name":"SEENSPACE Thong Lo","cat":"Korean","tags":"","rating":4.5,"reviews":695,"price":800,"price_src":"estimated (category median)","dist":1027,"total":57.0,"sr":22.1,"sg":0,"sp":15,"st":4,"sd":12.9,"su":3,"groups":"No","reserve":"No","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=SEENSPACE%20Thong%20Lo&query_place_id=ChIJUQcuQVOe4jARk9P5mB__Ej4","lat":13.7334223,"lng":100.5813826},{"rank":174,"name":"ข้าวมันไก่ซั่งไห่ Marché Thonglor","cat":"Chinese","tags":"","rating":4.5,"reviews":42,"price":100,"price_src":"scraped","dist":511,"total":57.0,"sr":18.4,"sg":0,"sp":9.7,"st":11,"sd":12.9,"su":5,"groups":"No","reserve":"No","closes_late":null,"url":"https://www.google.com/maps/search/?api=1&query=%E0%B8%82%E0%B9%89%E0%B8%B2%E0%B8%A7%E0%B8%A1%E0%B8%B1%E0%B8%99%E0%B9%84%E0%B8%81%E0%B9%88%E0%B8%8B%E0%B8%B1%E0%B9%88%E0%B8%87%E0%B9%84%E0%B8%AB%E0%B9%88%20March%C3%A9%20Thonglor&query_place_id=ChIJfwpVZRyf4jAR0b-I0cmix_M","lat":13.7287116,"lng":100.5816783},{"rank":175,"name":"Bigchok Salmon บิ๊กโชคแซลมอน","cat":"Japanese","tags":"","rating":5,"reviews":8,"price":300,"price_src":"scraped","dist":1354,"total":56.9,"sr":17.9,"sg":0,"sp":15,"st":4,"sd":15.0,"su":5,"groups":"No","reserve":"No","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=Bigchok%20Salmon%20%E0%B8%9A%E0%B8%B4%E0%B9%8A%E0%B8%81%E0%B9%82%E0%B8%8A%E0%B8%84%E0%B9%81%E0%B8%8B%E0%B8%A5%E0%B8%A1%E0%B8%AD%E0%B8%99&query_place_id=ChIJUfQuGQCf4jARxWdqJv5CW08","lat":13.7352884,"lng":100.5859734},{"rank":176,"name":"IPPUDO Market Place Thonglor (J Avenue)","cat":"Chinese","tags":"","rating":5,"reviews":9,"price":800,"price_src":"scraped","dist":1162,"total":54.9,"sr":18.0,"sg":0,"sp":15,"st":4,"sd":12.9,"su":5,"groups":"No","reserve":"No","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=IPPUDO%20Market%20Place%20Thonglor%20(J%20Avenue)&query_place_id=ChIJv4zrLA2f4jARiWBFL2hfMcI","lat":13.7346163,"lng":100.5817189},{"rank":177,"name":"โจ๊กสามย่าน ทองหล่อ (Jok Samyan Thonglor)","cat":"Chinese","tags":"","rating":4.2,"reviews":122,"price":450,"price_src":"estimated (category median)","dist":1239,"total":54.8,"sr":18.9,"sg":0,"sp":15,"st":4,"sd":12.9,"su":4,"groups":"No","reserve":"No","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=%E0%B9%82%E0%B8%88%E0%B9%8A%E0%B8%81%E0%B8%AA%E0%B8%B2%E0%B8%A1%E0%B8%A2%E0%B9%88%E0%B8%B2%E0%B8%99%20%E0%B8%97%E0%B8%AD%E0%B8%87%E0%B8%AB%E0%B8%A5%E0%B9%88%E0%B8%AD%20(Jok%20Samyan%20Thonglor)&query_place_id=ChIJyf7VHRaf4jARHNBpgstlkNs","lat":13.735159,"lng":100.5828927},{"rank":178,"name":"Eastbound","cat":"Other","tags":"Hotpot/Shabu","rating":3.8,"reviews":34,"price":250,"price_src":"scraped","dist":1202,"total":51.5,"sr":16.1,"sg":0,"sp":13.7,"st":4,"sd":10.7,"su":7,"groups":"No","reserve":"No","closes_late":null,"url":"https://www.google.com/maps/search/?api=1&query=Eastbound&query_place_id=ChIJPbepdVOe4jARmTBGXXJljdk","lat":13.734937,"lng":100.5821087},{"rank":179,"name":"ชาบูใต้หล้า Shabu Taila 天下火锅","cat":"Japanese","tags":"Hotpot/Shabu","rating":3.6,"reviews":19,"price":350,"price_src":"scraped","dist":1015,"total":51.4,"sr":14.7,"sg":0,"sp":15,"st":4,"sd":10.7,"su":7,"groups":"No","reserve":"No","closes_late":null,"url":"https://www.google.com/maps/search/?api=1&query=%E0%B8%8A%E0%B8%B2%E0%B8%9A%E0%B8%B9%E0%B9%83%E0%B8%95%E0%B9%89%E0%B8%AB%E0%B8%A5%E0%B9%89%E0%B8%B2%20Shabu%20Taila%20%E5%A4%A9%E4%B8%8B%E7%81%AB%E9%94%85&query_place_id=ChIJ5aX9342f4jAR-mccLebCfqI","lat":13.7312889,"lng":100.5867157},{"rank":180,"name":"JUMBO TONKATSU (Sukhumvit 49/9)","cat":"Japanese","tags":"","rating":5,"reviews":7,"price":1050,"price_src":"estimated (category median)","dist":1393,"total":50.8,"sr":17.7,"sg":0,"sp":12.2,"st":4,"sd":12.9,"su":4,"groups":"No","reserve":"No","closes_late":"No","url":"https://www.google.com/maps/search/?api=1&query=JUMBO%20TONKATSU%20(Sukhumvit%2049%2F9)&query_place_id=ChIJh0p7egCf4jARMBa5gruZPqs","lat":13.7359991,"lng":100.5764635},{"rank":181,"name":"ร้านหล่อเหลา Lhorlao Home Kitchen 罗佬家厨房中餐厅","cat":"Chinese","tags":"","rating":4.3,"reviews":12,"price":450,"price_src":"estimated (category median)","dist":983,"total":49.9,"sr":16.3,"sg":0,"sp":15,"st":7,"sd":8.6,"su":3,"groups":"No","reserve":"No","closes_late":null,"url":"https://www.google.com/maps/search/?api=1&query=%E0%B8%A3%E0%B9%89%E0%B8%B2%E0%B8%99%E0%B8%AB%E0%B8%A5%E0%B9%88%E0%B8%AD%E0%B9%80%E0%B8%AB%E0%B8%A5%E0%B8%B2%20Lhorlao%20Home%20Kitchen%20%E7%BD%97%E4%BD%AC%E5%AE%B6%E5%8E%A8%E6%88%BF%E4%B8%AD%E9%A4%90%E5%8E%85&query_place_id=ChIJeTz6daWf4jARf9Yql4fiFKM","lat":13.7330427,"lng":100.580985},{"rank":182,"name":"Shin Shabu Thonglor 10","cat":"Japanese","tags":"Buffet; Hotpot/Shabu","rating":null,"reviews":null,"price":1050,"price_src":"estimated (category median)","dist":936,"total":40.5,"sr":0,"sg":12,"sp":12.2,"st":7,"sd":4.3,"su":5,"groups":"Yes","reserve":"No","closes_late":null,"url":"https://www.google.com/maps/search/?api=1&query=Shin%20Shabu%20Thonglor%2010&query_place_id=ChIJ62gJNgCf4jAR3M0wU949rt4","lat":13.732431,"lng":100.5825993},{"rank":183,"name":"ไชน่า เจอร์นัล","cat":"Chinese","tags":"","rating":null,"reviews":null,"price":450,"price_src":"estimated (category median)","dist":1054,"total":39.6,"sr":0,"sg":8,"sp":15,"st":4,"sd":8.6,"su":4,"groups":"No","reserve":"Yes","closes_late":"Yes","url":"https://www.google.com/maps/search/?api=1&query=%E0%B9%84%E0%B8%8A%E0%B8%99%E0%B9%88%E0%B8%B2%20%E0%B9%80%E0%B8%88%E0%B8%AD%E0%B8%A3%E0%B9%8C%E0%B8%99%E0%B8%B1%E0%B8%A5&query_place_id=ChIJA-9RPFOe4jARllYo22qnnM4","lat":13.7335974,"lng":100.582097},{"rank":184,"name":"Max Pizza & Pasta สาขาเอกมัย21","cat":"Italian","tags":"","rating":null,"reviews":null,"price":500,"price_src":"estimated (category median)","dist":1828,"total":28.4,"sr":0,"sg":0,"sp":15,"st":4,"sd":6.4,"su":3,"groups":"No","reserve":"No","closes_late":null,"url":"https://www.google.com/maps/search/?api=1&query=Max%20Pizza%20%26%20Pasta%20%E0%B8%AA%E0%B8%B2%E0%B8%82%E0%B8%B2%E0%B9%80%E0%B8%AD%E0%B8%81%E0%B8%A1%E0%B8%B1%E0%B8%A221&query_place_id=ChIJz-7ZVSyf4jARrIvCkLDETmc","lat":13.7386548,"lng":100.588865}],"cats":{"Japanese":76,"Thai":31,"Other":5,"Chinese":22,"Korean":14,"Italian":29,"Steakhouse":7},"total_scored":184,"total_collected":190};
+
+// AI Analysis text for Top 3 (snapshot)
+const ANALYSIS = {
+  0: "ได้คะแนนสูงสม่ำเสมอทุกด้าน ไม่มีจุดอ่อนชัดเจน เรตติ้ง 4.8 จากรีวิวกว่า 1,200 รายการ คะแนนแยกด้านอาหาร-บริการ-บรรยากาศเต็มทั้งสาม ชาบูเป็นรูปแบบที่ทุกคนแชร์หม้อร่วมกัน เหมาะกับทีมที่อยากได้บรรยากาศสังสรรค์",
+  1: "ราคาคุ้มที่สุดใน 3 อันดับแรก (~600 บาท/หัว อยู่ในช่วงเหมาะพอดี) และมีฐานรีวิวใหญ่สุด สะท้อนความน่าเชื่อถือ อาหารไทยเมนูกว้าง ทุกคนในทีมหาของถูกปากได้ ปลอดภัยสุดถ้าทีมรสนิยมต่างกัน",
+  2: "อาหารใต้รสจัดที่มีเอกลักษณ์ชัด เป็นตัวเลือกที่ต่างจากร้านทั่วไป รีวิวหลายภาษาชมความ authentic แต่มีจุดต้องระวัง — อาหารค่อนข้างเผ็ด ควรเช็กกับทีมก่อนถ้ามีคนกินเผ็ดไม่ได้"
+};
+const MEDALS = ["อันดับ 1 — แนะนำสูงสุด","อันดับ 2","อันดับ 3"];
+const BARS = [["รีวิว","sr",25],["กลุ่ม","sg",20],["ราคา","sp",15],["เดินทาง","st",15],["ข้อมูล","sd",15],["เอกลักษณ์","su",10]];
+
+function stars(n){n=Math.round(n||0);return "★".repeat(n)+"☆".repeat(5-n);}
+function fmtDist(m){return m? (m>=1000?(m/1000).toFixed(1)+" กม.":m+" ม."):"—";}
+
+// ---- RENDER TOP 3 ----
+function renderPodium(){
+  const el=document.getElementById('podium');
+  el.innerHTML=DATA.top10.slice(0,3).map((r,i)=>{
+    const bars=BARS.map(([lb,k,mx])=>{
+      const v=r[k],pct=Math.round(v/mx*100);
+      return `<div class="p-bar-row"><span class="bl">${lb}</span><div class="p-bar-track"><div class="p-bar-fill" style="width:${pct}%"></div></div><span class="bv">${v}</span></div>`;
+    }).join('');
+    const revs=(r.review_list||[]).map(rv=>{
+      let det='';
+      if(rv.food||rv.service){det=`<div class="rev-detail"><span>อาหาร <b>${rv.food||'-'}</b></span><span>บริการ <b>${rv.service||'-'}</b></span><span>บรรยากาศ <b>${rv.atmos||'-'}</b></span></div>`;}
+      return `<div class="rev-item"><div class="rev-top"><span class="rev-stars">${stars(rv.stars)}</span><span class="rev-date">${rv.date||''}</span></div><div class="rev-text">${rv.text}</div>${det}</div>`;
+    }).join('')||'<p class="note">ไม่มีรีวิวที่มีข้อความ</p>';
+    const tags=(r.tags?r.tags.split('; '):[]).map(t=>`<span class="chip amber">${t}</span>`).join('');
+    return `<div class="p-card ${i===0?'gold':''} reveal">
+      <div class="p-rank">${i+1}</div>
+      <div class="p-body">
+        <div class="p-medal">${MEDALS[i]}</div>
+        <div class="p-name serif">${r.name}</div>
+        <div class="p-cat">${r.cat}</div>
+        <div class="p-score-big"><span class="n">${r.total}</span><span class="d">/ 100 คะแนน</span></div>
+        <div class="p-meta">${tags}<span class="chip">฿${r.price}/หัว</span><span class="chip">${fmtDist(r.dist)} จาก BTS</span></div>
+        <div class="p-bars">${bars}</div>
+        <div class="p-why">${ANALYSIS[i]}</div>
+        <iframe class="p-map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+          src="https://www.google.com/maps?q=${r.lat},${r.lng}&z=16&output=embed"></iframe>
+        <div class="p-actions">
+          <span class="p-btn primary" onclick="toggleRev(${i})">ดูรีวิวลูกค้า</span>
+          <a class="p-btn" href="${r.url}" target="_blank" rel="noopener">เปิด Google Maps</a>
+        </div>
+      </div>
+      <div class="rev-drawer" id="rev${i}">${revs}</div>
+    </div>`;
+  }).join('');
+}
+function toggleRev(i){document.getElementById('rev'+i).classList.toggle('open');}
+
+// ---- FILTER + TABLE ----
+let curFilter='all',curSort='rank',sortDir=1;
+function renderFilters(){
+  const cats=DATA.cats;
+  let btns=`<button class="fbtn active" data-f="all">ทั้งหมด <span class="cnt">${DATA.all.length}</span></button>`;
+  Object.keys(cats).sort((a,b)=>cats[b]-cats[a]).forEach(c=>{
+    btns+=`<button class="fbtn" data-f="${c}">${c} <span class="cnt">${cats[c]}</span></button>`;
+  });
+  document.getElementById('filters').innerHTML=btns;
+  document.querySelectorAll('.fbtn').forEach(b=>b.onclick=()=>{
+    document.querySelectorAll('.fbtn').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');curFilter=b.dataset.f;renderTable();
+  });
+}
+function renderTable(){
+  let rows=DATA.all.filter(r=>curFilter==='all'||r.cat===curFilter);
+  rows.sort((a,b)=>{
+    let av,bv;
+    if(curSort==='name'){av=a.name;bv=b.name;return sortDir*av.localeCompare(bv,'th');}
+    if(curSort==='status'){av=a.closes_late==='Yes'?1:0;bv=b.closes_late==='Yes'?1:0;}
+    else{av=a[curSort]||0;bv=b[curSort]||0;}
+    return sortDir*(av-bv);
+  });
+  const top=rows.slice(0,10);
+  document.getElementById('tbody').innerHTML=top.map((r,i)=>{
+    const tags=(r.tags?r.tags.split('; '):[]).map(t=>`<span class="t-tag">${t}</span>`).join('');
+    const badge=r.closes_late==='Yes'
+      ?'<span class="t-badge late">เปิดถึงดึก</span>'
+      :'<span class="t-badge open">เปิดมื้อเย็น</span>';
+    return `<tr>
+      <td class="num"><span class="t-rank">${i+1}</span></td>
+      <td><div class="t-name">${r.name} <span class="tcat">· ${r.cat}</span></div><div class="t-tags">${tags}</div></td>
+      <td class="num">${r.rating} <span style="color:var(--text-mute);font-size:12px">(${r.reviews})</span></td>
+      <td class="num">฿${r.price}</td>
+      <td class="num">${fmtDist(r.dist)}</td>
+      <td>${badge}</td>
+      <td class="num"><span class="t-score">${r.total}</span></td>
+      <td><a class="t-maplink" href="${r.url}" target="_blank" rel="noopener">เปิดแผนที่</a></td>
+    </tr>`;
+  }).join('');
+  const label=curFilter==='all'?'ทุกประเภท':curFilter;
+  document.getElementById('table-count').textContent=
+    `แสดง 10 อันดับแรกจาก ${rows.length} ร้าน (${label}) — จากทั้งหมด ${DATA.total_scored} ร้านที่ผ่านเกณฑ์มื้อเย็น`;
+}
+document.querySelectorAll('th[data-sort]').forEach(th=>{
+  th.onclick=()=>{
+    const s=th.dataset.sort;
+    if(curSort===s)sortDir*=-1;
+    else{curSort=s;sortDir=(s==='rank'||s==='name')?1:-1;}
+    renderTable();
+  };
+});
+
+// ---- REFRESH BUTTON ----
+// REFRESH_URL: webhook จาก n8n Workflow B
+const REFRESH_URL='https://n8n-external.exservice.io/webhook/thonglor-radar';
+// ---- REFRESH LOGIC (shared by button + auto-load) ----
+async function doRefresh(opts){
+  opts=opts||{};
+  // build lookup of existing reviews by restaurant name (survives re-ranking)
+  const prevReviews={};
+  (DATA.top10||[]).forEach(r=>{if(r.name&&r.review_list&&r.review_list.length)prevReviews[r.name]=r.review_list;});
+  function mapRow(r){
+    return {
+      rank:Number(r.rank), name:r.name||'', cat:r.primary_category||'',
+      tags:r.tags||'', rating:Number(r.rating)||0, reviews:Number(r.review_count)||0,
+      price:Number(r.price_mid)||0, price_src:r.price_raw||'',
+      dist:Number(r.distance_bts_m)||0, total:Number(r.total)||0,
+      sr:Number(r.s_rating)||0, sg:Number(r.s_group)||0, sp:Number(r.s_price)||0,
+      st:Number(r.s_travel)||0, sd:Number(r.s_data)||0, su:Number(r.s_unique)||0,
+      groups:r.crowd_groups||'', reserve:r.accepts_reservation||'',
+      closes_late:r.closes_after_2100||'', lat:Number(r.lat)||0, lng:Number(r.lng)||0,
+      url:'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(r.name||''),
+      review_list:prevReviews[r.name]||[]
+    };
+  }
+  if(!REFRESH_URL) throw new Error('no refresh url');
+  // 8s timeout so a dead n8n doesn't hang the page
+  const ctl=new AbortController();
+  const timer=setTimeout(()=>ctl.abort(),8000);
+  try{
+    const res=await fetch(REFRESH_URL,{signal:ctl.signal});
+    const j=await res.json();
+    if(j.top10&&j.top10.length){
+      DATA.top10=j.top10.map(mapRow);
+      DATA.all=(j.all||j.top10).map(mapRow);
+      renderPodium();renderTable();applyReveal();
+    }
+    if(j.last_updated)setTime(j.last_updated);
+    setRefreshed();
+  } finally { clearTimeout(timer); }
+}
+
+document.getElementById('btnRefresh').onclick=async function(){
+  const btn=this;btn.classList.add('spin');
+  if(!REFRESH_URL){
+    setTimeout(()=>{btn.classList.remove('spin');
+      document.getElementById('radar-fresh').textContent='ข้อมูลล่าสุด (snapshot)';},900);
+    return;
+  }
+  try{ await doRefresh(); }
+  catch(e){ console.warn('refresh failed',e); }
+  btn.classList.remove('spin');
+};
+
+// ---- TIMESTAMP + FRESHNESS ----
+function setTime(ts){
+  const el=document.getElementById('radar-time');
+  if(!ts){ el.textContent='ข้อมูลชุดเริ่มต้น'; }
+  else{
+    const d=new Date(ts.replace(' UTC','Z'));
+    const opt={day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'};
+    el.textContent=d.toLocaleString('th-TH',opt);
+  }
+  document.getElementById('m-date').textContent=new Date().toLocaleDateString('th-TH',{day:'numeric',month:'long',year:'numeric'});
+}
+function setRefreshed(){
+  const opt={hour:'2-digit',minute:'2-digit'};
+  document.getElementById('radar-refreshed').textContent=new Date().toLocaleTimeString('th-TH',opt);
+}
+setTime();
+setRefreshed();
+document.getElementById('m-total').textContent=DATA.total_scored+' ร้าน';
+
+// ---- AUTO-REFRESH ON LOAD ----
+// page shows embedded data instantly, then silently pulls latest from n8n.
+// if n8n is down/slow, the embedded data stays — page never breaks.
+(function(){
+  if(!REFRESH_URL) return;
+  const ring=document.querySelector('.radar-ring');
+  if(ring)ring.classList.add('sweep');
+  doRefresh({silent:true}).catch(e=>{
+    console.warn('auto-refresh skipped:',e);
+    // keep embedded data; radar-time stays "ข้อมูลชุดเริ่มต้น"
+  });
+})();
+
+// ---- REVEAL ON SCROLL ----
+function applyReveal(){
+  const obs=new IntersectionObserver(es=>{
+    es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');obs.unobserve(e.target);}});
+  },{threshold:.12});
+  document.querySelectorAll('.reveal:not(.in)').forEach((el,i)=>{
+    el.style.transitionDelay=(i%6*0.06)+'s';obs.observe(el);
+  });
+}
+
+// ---- AI RECOMMENDER (rule-based) ----
+const recSel={cat:null,tag:null,budget:null,extra:new Set()};
+function setupChips(groupId,key,multi){
+  document.querySelectorAll('#'+groupId+' .rec-chip').forEach(c=>{
+    c.onclick=()=>{
+      const v=c.dataset.v;
+      if(multi){
+        if(recSel.extra.has(v)){recSel.extra.delete(v);c.classList.remove('on');}
+        else{recSel.extra.add(v);c.classList.add('on');}
+      }else{
+        const wasOn=c.classList.contains('on');
+        document.querySelectorAll('#'+groupId+' .rec-chip').forEach(x=>x.classList.remove('on'));
+        if(wasOn){recSel[key]=null;}
+        else{c.classList.add('on');recSel[key]=v;}
+      }
+    };
+  });
+}
+setupChips('rc-cat','cat',false);
+setupChips('rc-tag','tag',false);
+setupChips('rc-budget','budget',false);
+setupChips('rc-extra','extra',true);
+
+const CATTH={Japanese:'ญี่ปุ่น',Thai:'ไทย',Korean:'เกาหลี',Chinese:'จีน',Italian:'อิตาเลียน',Steakhouse:'สเต๊ก',Other:'อื่นๆ'};
+const TAGTH={'Buffet':'บุฟเฟต์','Hotpot/Shabu':'หม้อไฟ/ชาบู','Yakiniku/BBQ':'ปิ้งย่าง'};
+
+document.getElementById('recAsk').onclick=function(){
+  let pool=DATA.all.slice();
+  const want=[];
+  if(recSel.cat){pool=pool.filter(r=>r.cat===recSel.cat);want.push('แนว'+CATTH[recSel.cat]);}
+  if(recSel.tag){pool=pool.filter(r=>(r.tags||'').includes(recSel.tag));want.push(TAGTH[recSel.tag]);}
+  if(recSel.budget==='lo'){pool=pool.filter(r=>r.price<=400);want.push('งบไม่เกิน 400');}
+  else if(recSel.budget==='mid'){pool=pool.filter(r=>r.price>=400&&r.price<=800);want.push('งบ 400–800');}
+  if(recSel.extra.has('near')){pool=pool.filter(r=>r.dist&&r.dist<600);want.push('ใกล้ BTS');}
+  if(recSel.extra.has('late')){pool=pool.filter(r=>r.closes_late==='Yes');want.push('เปิดถึงดึก');}
+
+  pool.sort((a,b)=>b.total-a.total);
+  const picks=pool.slice(0,3);
+  const ans=document.getElementById('recAnswer');
+  const bubble=document.getElementById('recBubble');
+  const results=document.getElementById('recResults');
+  ans.classList.add('show');
+
+  if(!want.length){
+    bubble.innerHTML='ยังไม่ได้เลือกเงื่อนไขเลย — ลองเลือกแนวอาหารหรืองบประมาณดูก่อน แล้วกดอีกครั้งนะ';
+    results.innerHTML='';return;
+  }
+  if(!picks.length){
+    bubble.innerHTML='ไม่เจอร้านที่ตรงเงื่อนไข <b>'+want.join(' · ')+'</b> ทั้งหมดพร้อมกัน — ลองลดเงื่อนไขลงสักข้อดู เช่น ขยายงบ หรือเอาเงื่อนไขใกล้ BTS ออก';
+    results.innerHTML='';return;
+  }
+  bubble.innerHTML='จากเงื่อนไข <b>'+want.join(' · ')+'</b> — พบ '+pool.length+' ร้านที่ตรง คัดมา '+picks.length+' อันดับแรกที่คะแนนสูงสุด:';
+  results.innerHTML=picks.map(r=>{
+    const why=[];
+    if(r.rating>=4.5)why.push('เรตติ้ง '+r.rating);
+    if(r.sg>=20)why.push('รองรับกลุ่ม+รับจอง');
+    if(r.price<=400)why.push('ราคาประหยัด');
+    else if(r.price<=800)why.push('ราคากำลังดี');
+    if(r.dist&&r.dist<600)why.push('ใกล้ BTS');
+    return '<div class="rec-result">'+
+      '<div class="rec-rscore">'+r.total+'<span>คะแนน</span></div>'+
+      '<div class="rec-rinfo">'+
+        '<div class="rec-rname">'+r.name+'</div>'+
+        '<div class="rec-rmeta">'+(CATTH[r.cat]||r.cat)+' · ฿'+r.price+'/หัว · '+fmtDist(r.dist)+' จาก BTS</div>'+
+        '<div class="rec-rwhy">จุดเด่น: '+why.join(' · ')+'</div>'+
+      '</div>'+
+      '<a class="rec-rlink" href="'+r.url+'" target="_blank" rel="noopener">Maps</a>'+
+    '</div>';
+  }).join('');
+  ans.scrollIntoView({behavior:'smooth',block:'nearest'});
+};
+
+// ---- INIT ----
+renderPodium();renderFilters();renderTable();applyReveal();
+</script>
+</body>
+</html>
