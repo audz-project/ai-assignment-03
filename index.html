@@ -812,7 +812,11 @@ let curFilter='all',curSort='rank',sortDir=1;
 function renderFilters(){
   const cats=DATA.cats;
   let btns=`<button class="fbtn active" data-f="all">ทั้งหมด <span class="cnt">${DATA.all.length}</span></button>`;
-  Object.keys(cats).sort((a,b)=>cats[b]-cats[a]).forEach(c=>{
+  Object.keys(cats).sort((a,b)=>{
+    if(a==='Other')return 1;
+    if(b==='Other')return -1;
+    return cats[b]-cats[a];
+  }).forEach(c=>{
     btns+=`<button class="fbtn" data-f="${c}">${c} <span class="cnt">${cats[c]}</span></button>`;
   });
   document.getElementById('filters').innerHTML=btns;
