@@ -284,6 +284,29 @@ tbody tr:nth-child(-n+3) .t-rank{color:var(--amber)}
 .t-badge.open{background:rgba(126,184,126,.12);color:var(--green);border:1px solid rgba(126,184,126,.3)}
 .t-badge.late{background:rgba(224,192,78,.1);color:var(--yellow);border:1px solid rgba(224,192,78,.3)}
 
+/* ===== CONFIDENCE PILL (data-driven, traceable) ===== */
+.conf{display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:3px 9px;border-radius:11px;
+  cursor:default;position:relative;white-space:nowrap;border:1px solid transparent}
+.conf .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.conf.high{background:rgba(126,184,126,.12);color:var(--green);border-color:rgba(126,184,126,.3)}
+.conf.high .dot{background:var(--green)}
+.conf.mid{background:rgba(224,192,78,.1);color:var(--yellow);border-color:rgba(224,192,78,.3)}
+.conf.mid .dot{background:var(--yellow)}
+.conf.low{background:rgba(214,123,98,.12);color:var(--coral,#d67b62);border-color:rgba(214,123,98,.3)}
+.conf.low .dot{background:var(--coral,#d67b62)}
+.conf .tip{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);
+  background:var(--bg2,#1a1916);border:1px solid var(--line2);border-radius:8px;padding:9px 11px;
+  width:230px;font-size:11px;line-height:1.5;color:var(--text-dim);text-align:left;
+  opacity:0;visibility:hidden;transition:opacity .15s;z-index:20;
+  box-shadow:0 6px 20px rgba(0,0,0,.4)}
+.conf .tip b{color:var(--text);display:block;margin-bottom:4px;font-size:11px}
+.conf .tip ul{margin:0;padding-left:14px}
+.conf .tip li{margin:2px 0}
+.conf:hover .tip{opacity:1;visibility:visible}
+.conf .tip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);
+  border:5px solid transparent;border-top-color:var(--line2)}
+@media(max-width:640px){.conf .tip{width:180px;left:auto;right:0;transform:none}.conf .tip::after{left:auto;right:14px;transform:none}}
+
 /* ===== SCORING MODEL ===== */
 .score-model{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px}
 .sm-card{
@@ -638,6 +661,7 @@ footer p{font-size:14px;color:var(--text-mute);margin-top:8px}
           <th class="num" data-sort="dist">ระยะ BTS <span class="arr">▾</span></th>
           <th data-sort="status">สถานะ</th>
           <th class="num" data-sort="total">คะแนนรวม <span class="arr">▾</span></th>
+          <th class="num" data-sort="conf">ความเชื่อมั่น <span class="arr">▾</span></th>
           <th>แผนที่</th>
         </tr></thead>
         <tbody id="tbody"></tbody>
@@ -803,6 +827,7 @@ function renderTable(){
     let av,bv;
     if(curSort==='name'){av=a.name;bv=b.name;return sortDir*av.localeCompare(bv,'th');}
     if(curSort==='status'){av=a.closes_late==='Yes'?1:0;bv=b.closes_late==='Yes'?1:0;}
+    else if(curSort==='conf'){av=calcConfidence(a).pct;bv=calcConfidence(b).pct;}
     else{av=a[curSort]||0;bv=b[curSort]||0;}
     return sortDir*(av-bv);
   });
@@ -820,6 +845,7 @@ function renderTable(){
       <td class="num">${fmtDist(r.dist)}</td>
       <td>${badge}</td>
       <td class="num"><span class="t-score">${r.total}</span></td>
+      <td class="num">${(()=>{const c=calcConfidence(r);return `<span class="conf ${c.level}"><span class="dot"></span>${c.pct}%<span class="tip"><b>ความเชื่อมั่นข้อมูล ${c.pct}%</b><ul>${c.reasons.map(x=>`<li>${x}</li>`).join('')}</ul></span></span>`;})()}</td>
       <td><a class="t-maplink" href="${r.url}" target="_blank" rel="noopener">เปิดแผนที่</a></td>
     </tr>`;
   }).join('');
@@ -840,6 +866,27 @@ document.querySelectorAll('th[data-sort]').forEach(th=>{
 // proxy via Vercel /api/data (เลี่ยง CORS — server-to-server fetch n8n แล้วใส่ CORS header เอง)
 const REFRESH_URL='/api/data';
 
+// ---- CONFIDENCE (data-driven, computed in browser from real fields) ----
+// โปร่งใส: คำนวณจาก 3 สัญญาณจริง ไม่ใช่เลข AI เดา
+//   1) Data Completeness (s_data /15) — ข้อมูลครบแค่ไหน        น้ำหนัก 50%
+//   2) Review volume (log-scaled)     — รีวิวเยอะ = ยืนยันได้   น้ำหนัก 35%
+//   3) Rating validity (มี rating สมเหตุผล 1-5)                น้ำหนัก 15%
+function calcConfidence(r){
+  const compRatio = Math.min((r.sd||0)/15, 1);              // 0..1
+  const revScore  = Math.min(Math.log10((r.reviews||0)+1)/3, 1); // ~1000 reviews → เต็ม
+  const rateValid = (r.rating>=1 && r.rating<=5) ? 1 : 0;
+  const conf = compRatio*0.50 + revScore*0.35 + rateValid*0.15;
+  const pct = Math.round(conf*100);
+  // เหตุผลย่อยสำหรับ tooltip — traceable ทุกตัว
+  const reasons=[];
+  reasons.push(`ข้อมูลครบ ${Math.round(compRatio*100)}% (Data Completeness ${(r.sd||0).toFixed(1)}/15)`);
+  reasons.push(`รีวิว ${(r.reviews||0).toLocaleString()} รายการ`);
+  reasons.push(rateValid?`เรตติ้ง ${r.rating} สมเหตุผล`:`เรตติ้งไม่สมบูรณ์`);
+  let level='high';
+  if(pct<60) level='low'; else if(pct<80) level='mid';
+  return {pct, level, reasons};
+}
+
 // Map Workflow B field names -> HTML render field names
 function mapRow(r){
   return {
@@ -855,7 +902,6 @@ function mapRow(r){
     ai_analysis:r.ai_analysis||''
   };
 }
-
 function showLoadingState(){
   document.getElementById('podium').innerHTML=
     '<div class="state-box state-loading"><div class="state-spinner"></div><div class="state-msg">กำลังโหลดข้อมูลจากระบบ…</div></div>';
